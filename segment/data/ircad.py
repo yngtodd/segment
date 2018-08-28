@@ -30,7 +30,6 @@ class Patient:
                   f'Space between slices: {metadata.SpacingBetweenSlices:.5f}'
         return message
 
-
     def _list_dicoms(self):
         dicompath = os.path.join(self.path, 'PATIENT_DICOM')
 
