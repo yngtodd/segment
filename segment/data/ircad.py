@@ -32,7 +32,14 @@ class Patient:
         return message
 
     def _list_dicoms(self):
-        """Get dicom paths in proper order"""
+        """
+        Get dicom paths in proper order.
+        
+        Returns
+        -------
+        dicoms : list
+            List of dicom paths for the patient.
+        """
         dicompath = os.path.join(self.path, 'PATIENT_DICOM')
         dicoms = [os.path.join(dicompath, img) for img in os.listdir(dicompath)] 
         # os sorts things lexicographically
@@ -40,10 +47,17 @@ class Patient:
         return dicoms 
 
     def load_3d(self):
-        """"""
+        """
+        Load 3D pixel array for the patient.
+        
+        Returns
+        -------
+        arry : np.ndarray 
+            3D pixel array for patient's CT scan.
+        """
         imgs = [pydicom.read_file(dicom) for dicom in self.dicoms]
-        data = np.stack([img.pixel_array for img in imgs])
-        return data
+        arry = np.stack([img.pixel_array for img in imgs])
+        return arry 
         
 
 class IRCAD(Dataset):
