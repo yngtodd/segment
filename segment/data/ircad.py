@@ -175,8 +175,6 @@ class IRCAD2D(Dataset):
 
     def __getitem__(self, idx):
         img = self.slices[idx]
-
         if self.transform is not None:
             img = self.transform(img)
-
         return img
