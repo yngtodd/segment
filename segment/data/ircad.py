@@ -122,10 +122,10 @@ class IRCAD3D(Dataset):
     https://www.ircad.fr/research/3d-ircadb-01/
     """
     def __init__(self, path):
-        self.data = IRCAD(path)
+        self.ircad = IRCAD(path)
 
     def __repr__(self):
         return f'IRCAD 3D liver segmentation'
 
     def __len__(self):
-        return len(self.data.patients)
+        return len(self.ircad.patients)
