@@ -1,5 +1,6 @@
 import os
 import pydicom
+import numpy as np
 
 from natsort import natsorted
 from torch.utils.data import Dataset
@@ -31,12 +32,46 @@ class Patient:
         return message
 
     def _list_dicoms(self):
+        """
+        Get dicom paths in proper order.
+        
+        Returns
+        -------
+        dicoms : list
+            List of dicom paths for the patient.
+        """
         dicompath = os.path.join(self.path, 'PATIENT_DICOM')
         dicoms = [os.path.join(dicompath, img) for img in os.listdir(dicompath)] 
         # os sorts things lexicographically
         dicoms = natsorted(dicoms)
         return dicoms 
 
+    def load_3d(self):
+        """
+        Load 3D pixel array for the patient.
+        
+        Returns
+        -------
+        arry : np.ndarray 
+            3D pixel array for patient's CT scan.
+        """
+        imgs = [pydicom.read_file(dicom) for dicom in self.dicoms]
+        arry = np.stack([img.pixel_array for img in imgs])
+        return arry 
+
+    def load_slices(self):
+        """
+        Load patient CT scan slices.
+
+        Returns
+        -------
+        slices : list of np.arrays
+             All 2D CT scans for a patient.
+        """
+        dicoms = [pydicom.read_file(dicom) for dicom in self.dicoms]
+        slices = [dicom.pixel_array for dicom in dicoms]
+        return slices
+        
 
 class IRCAD(Dataset):
     """
