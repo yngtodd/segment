@@ -58,6 +58,19 @@ class Patient:
         imgs = [pydicom.read_file(dicom) for dicom in self.dicoms]
         arry = np.stack([img.pixel_array for img in imgs])
         return arry 
+
+    def load_slices(self):
+        """
+        Load patient CT scan slices.
+
+        Returns
+        -------
+        slices : list of np.arrays
+             All 2D CT scans for a patient.
+        """
+        dicoms = [pydicom.read_file(dicom) for dicom in self.dicoms]
+        slices = [dicom.pixel_array for dicom in dicoms]
+        return slices
         
 
 class IRCAD(Dataset):
