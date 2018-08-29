@@ -171,6 +171,7 @@ class IRCAD2D(Dataset):
         for path in self.ircad.patients:
             patient = Patient(path)
             all_slices.extend(patient.load_slices())
+            print(f'Num slices: {len(all_slices)}')
         return all_slices
 
     def __getitem__(self, idx):
