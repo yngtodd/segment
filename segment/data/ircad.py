@@ -167,6 +167,14 @@ class IRCAD2D(Dataset):
         return len(self.slices)
 
     def _load_slices(self):
+        """
+        Loads all 2D CT slices in memory.
+
+        Returns
+        -------
+        all_slices : list of np.ndarrays
+            All 2D CT scans in natural order for each patient.
+        """
         all_slices = []
         for path in self.ircad.patients:
             patient = Patient(path)
