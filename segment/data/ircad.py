@@ -164,7 +164,7 @@ class IRCAD2D(Dataset):
         return f'IRCAD 2D liver segmentation'
 
     def __len__(self):
-        return len(self.ircad.patients)
+        return len(self.slices)
 
     def _load_slices(self):
         all_slices = []
