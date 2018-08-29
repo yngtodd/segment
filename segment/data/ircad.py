@@ -73,14 +73,70 @@ class Patient:
         return slices
         
 
-class IRCAD(Dataset):
+class IRCAD:
     """
     3D-IRCADb-01 dataset.
+
+    Parameters
+    ----------
+    path : str
+        Path to IRCAD dataset.
 
     References
     ----------
     https://www.ircad.fr/research/3d-ircadb-01/
     """
-    def __init__(self):
-        pass
+    def __init__(self, path):
+        self.path = path
+        self.patients = self._list_patients()
 
+    def __repr__(self):
+        return f'IRCAD liver segmentation dataset.' 
+
+    def _list_patients(self):
+        """
+        Get patient paths in proper order.
+
+        Returns
+        -------
+        patients : list
+            List of patient paths for the dataset.
+        """
+        patients = [os.path.join(self.path, patient) for patient in os.listdir(self.path)]
+        # os sorts things lexicographically
+        patients = natsorted(patients)
+        return patients 
+
+
+class IRCAD3D(Dataset):
+    """
+    3D IRCAD dataset.
+
+    Parameters
+    ----------
+    path : str
+        Path to IRCAD dataset.
+
+    References
+    ----------
+    https://www.ircad.fr/research/3d-ircadb-01/
+    """
+    def __init__(self, path, transform=None):
+        self.ircad = IRCAD(path)
+        self.transform = transform
+
+    def __repr__(self):
+        return f'IRCAD 3D liver segmentation'
+
+    def __len__(self):
+        return len(self.ircad.patients)
+
+    def __getitem__(self, idx):
+        patient_path = self.ircad.patients[idx]
+        patient = Patient(patient_path)
+        img = patient.load_3d()
+
+        if self.transform is not None:
+            img = self.transform(img)
+
+        return img 
