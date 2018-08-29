@@ -140,3 +140,43 @@ class IRCAD3D(Dataset):
             img = self.transform(img)
 
         return img 
+
+
+class IRCAD2D(Dataset):
+    """
+    2D IRCAD dataset.
+
+    Parameters
+    ----------
+    path : str
+        Path to IRCAD dataset.
+
+    References
+    ----------
+    https://www.ircad.fr/research/3d-ircadb-01/
+    """
+    def __init__(self, path, transform=None):
+        self.ircad = IRCAD(path)
+        self.slices = self._load_slices()
+        self.transform = transform
+
+    def __repr__(self):
+        return f'IRCAD 2D liver segmentation'
+
+    def __len__(self):
+        return len(self.ircad.patients)
+
+    def _load_slices(self):
+        all_slices = []
+        for path in self.ircad.patients:
+            patient = Patient(path)
+            all_slices.extend(patient.load_slices())
+        return all_slices
+
+    def __getitem__(self, idx):
+        img = self.slices[idx]
+
+        if self.transform is not None:
+            img = self.transform(img)
+
+        return img
