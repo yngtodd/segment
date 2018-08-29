@@ -32,12 +32,7 @@ class Patient:
 
     def _list_dicoms(self):
         dicompath = os.path.join(self.path, 'PATIENT_DICOM')
-
-        dicoms = []
-        for directory, _, files in os.walk(dicompath):
-            for filename in files:
-                dicoms.append(os.path.join(directory,filename))
-        
+        dicoms = [os.path.join(dicompath, img) for img in os.listdir(dicompath)] 
         # os sorts things lexicographically
         dicoms = natsorted(dicoms)
         return dicoms 
