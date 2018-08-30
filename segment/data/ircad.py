@@ -261,7 +261,7 @@ class IRCAD2D(Dataset):
         all_labels = []
         for path in self.ircad.patients:
             patient = Patient(path)
-            all_slices.extend(patient.load_labels())
+            all_labels.extend(patient.load_labels())
         return all_labels
 
     def _load_masks(self):
