@@ -19,3 +19,8 @@ Segment
 -------
 
 Medical imaging segmentation
+
+For a full introduction to the library, including a brief overview of medical image segmentation, check out our `documentation`_.
+
+
+.. _documentation: https://segment.readthedocs.io/en/latest/
