@@ -19,11 +19,12 @@ class Patient:
     ----------
     https://www.ircad.fr/research/3d-ircadb-01/
     """
-    def __init__(self, path):
+    def __init__(self, path, tissue=None):
         self.path = path
+        self.tissue = tissue
         self.dicoms = self._list_dicoms()
         self.labels = self._list_labels()
-        self.masks = self._list_masks()
+        self.masks = self._list_masks() if self.tissue else None
 
     def __repr__(self):
         metadata = pydicom.read_file(self.dicoms[0])
@@ -63,16 +64,22 @@ class Patient:
         labels = natsorted(labels)
         return labels
 
-    def _list_masks(self, tissue):
+    def _list_masks(self):
         """
         Get mask paths for a tissue.
+
+        Parameters
+        ----------
+        tissue : str
+            Type of tissue to segment. Options found in IRCAD `/MASKS_DICOM`
 
         Returns
         -------
         masks : list
             List of mask paths for a tissue.
         """
-        maskpath = os.path.join(self.path, 'LABELLED_DICOM/tissue')
+        maskpath = os.path.join(self.path, 'MASKS_DICOM')
+        maskpath = os.path.join(maskpath, self.tissue)
         masks = [os.path.join(maskpath, img) for img in os.listdir(maskpath)]
         # os sorts things lexicographically
         masks = natsorted(masks)
@@ -213,12 +220,12 @@ class IRCAD2D(Dataset):
     ----------
     https://www.ircad.fr/research/3d-ircadb-01/
     """
-    def __init__(self, path, tissue=None, labels=None, transform=None):
+    def __init__(self, path, tissue=None, transform=None):
         self.ircad = IRCAD(path)
         self.tissue = tissue
         self.slices = self._load_slices()
-        self.labels = self._load_labels() if labels is not None
-        self.masks = self._load_masks(self.tissue) if self.tissue is not None
+        self.masks = self._load_masks() if self.tissue else None
+        self.all_masks = self._load_labels() if self.tissue is None else None
         self.transform = transform
 
     def __repr__(self):
@@ -268,17 +275,17 @@ class IRCAD2D(Dataset):
         """
         all_masks = []
         for path in self.ircad.patients:
-            patient = Patient(path)
-            all_slices.extend(patient.load_masks())
-        return all_labels
+            patient = Patient(path, self.tissue)
+            all_masks.extend(patient.load_masks())
+        return all_masks
 
     def __getitem__(self, idx):
         img = self.slices[idx]
 
-        if self.labels:
-            label = self.labels[idx]
-        else if self.masks:
+        if self.masks:
             label = self.masks[idx]
+        else:
+            label = self.all_masks[idx]
 
         if self.transform is not None:
             img = self.transform(img)
