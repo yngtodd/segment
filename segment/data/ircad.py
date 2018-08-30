@@ -15,6 +15,9 @@ class Patient:
     path : str
         Path to patient records.
 
+    tissue : str, optional
+        Type of tissue mask to load.
+
     References
     ----------
     https://www.ircad.fr/research/3d-ircadb-01/
@@ -66,12 +69,9 @@ class Patient:
 
     def _list_masks(self):
         """
-        Get mask paths for a tissue.
+        Get mask paths for a particular tissue.
 
-        Parameters
-        ----------
-        tissue : str
-            Type of tissue to segment. Options found in IRCAD `/MASKS_DICOM`
+        If no tissue is specified, these paths will not be set.
 
         Returns
         -------
@@ -211,10 +211,19 @@ class IRCAD2D(Dataset):
     """
     2D IRCAD dataset.
 
+    Instance of all patients' 2D slices of dicom images. Labels are masks for
+    either a single tissue, or, if no tissue is specified, for all tissues.
+
     Parameters
     ----------
     path : str
         Path to IRCAD dataset.
+
+    tissue : str, optional
+        Type of tissue to segment. Options found in IRCAD `/MASKS_DICOM`.
+
+    transform : Pytorch transforms, optional
+        Pytorch transfrom for images.
 
     References
     ----------
@@ -223,10 +232,10 @@ class IRCAD2D(Dataset):
     def __init__(self, path, tissue=None, transform=None):
         self.ircad = IRCAD(path)
         self.tissue = tissue
-        self.slices = self._load_slices()
-        self.masks = self._load_masks() if self.tissue else None
-        self.all_masks = self._load_labels() if self.tissue is None else None
         self.transform = transform
+        self.slices = self._load_slices()
+        self.tissue_masks = self._load_masks() if self.tissue else None
+        self.all_masks = self._load_labels() if self.tissue is None else None
 
     def __repr__(self):
         return f'IRCAD 2D liver segmentation'
@@ -283,7 +292,7 @@ class IRCAD2D(Dataset):
         img = self.slices[idx]
 
         if self.masks:
-            label = self.masks[idx]
+            label = self.tissue_masks[idx]
         else:
             label = self.all_masks[idx]
 
