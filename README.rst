@@ -8,8 +8,8 @@
 
 --------------------------
 
-.. image:: https://badge.fury.io/py/segment.png
-    :target: http://badge.fury.io/py/segment
+.. image:: https://badge.fury.io/py/medicalsegment.png
+    :target: http://badge.fury.io/py/medicalsegment
 
 .. image:: https://travis-ci.org/yngtodd/segment.svg?branch=master
     :target: https://travis-ci.org/yngtodd/segment
