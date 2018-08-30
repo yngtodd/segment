@@ -11,7 +11,7 @@
 .. image:: https://badge.fury.io/py/segment.png
     :target: http://badge.fury.io/py/segment
 
-.. image:: https://travis-ci.org/yngtodd/segment.png?branch=master
+.. image:: https://travis-ci.org/yngtodd/segment.svg?branch=master
     :target: https://travis-ci.org/yngtodd/segment
 
 
