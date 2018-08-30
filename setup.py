@@ -22,7 +22,7 @@ The full documentation is at http://segment.rtfd.org."""
 history = open('HISTORY.rst').read().replace('.. :changelog:', '')
 
 setup(
-    name='segment',
+    name='medicalsegment',
     version='0.1.0',
     description='Medical imaging segmentation',
     long_description=readme + '\n\n' + doclink + '\n\n' + history,
