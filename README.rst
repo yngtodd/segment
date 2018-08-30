@@ -2,7 +2,7 @@
 
     <embed>
         <p align="center">
-            <img width="300" src="https://github.com/yngtodd/segment/blob/master/img/SEGMENT.png">
+            <img width="300" src="https://github.com/yngtodd/segment/blob/master/img/segment_crop.png">
         </p>
     </embed>
 
