@@ -15,14 +15,7 @@
     :target: https://travis-ci.org/yngtodd/segment
 
 
-=============================
 Segment
-=============================
+-------
 
 Medical imaging segmentation
-
-Features
---------
-
-* TODO
-
