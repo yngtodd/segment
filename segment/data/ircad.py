@@ -291,7 +291,7 @@ class IRCAD2D(Dataset):
     def __getitem__(self, idx):
         img = self.slices[idx]
 
-        if self.masks:
+        if self.tissue:
             label = self.tissue_masks[idx]
         else:
             label = self.all_masks[idx]
