@@ -26,8 +26,7 @@ class Patient:
         self.path = path
         self.tissue = tissue
         self.dicoms = self._list_dicoms()
-        self.labels = self._list_labels()
-        self.masks = self._list_masks() if self.tissue else None
+        self.masks = self._list_masks()
 
     def __repr__(self):
         metadata = pydicom.read_file(self.dicoms[0])
@@ -52,21 +51,6 @@ class Patient:
         dicoms = natsorted(dicoms)
         return dicoms
 
-    def _list_labels(self):
-        """
-        Get label paths for all tissues.
-
-        Returns
-        -------
-        labels : list
-            List of label paths for all tissues segmented.
-        """
-        labelpath = os.path.join(self.path, 'LABELLED_DICOM')
-        labels = [os.path.join(labelpath, img) for img in os.listdir(labelpath)]
-        # os sorts things lexicographically
-        labels = natsorted(labels)
-        return labels
-
     def _list_masks(self):
         """
         Get mask paths for a particular tissue.
@@ -78,8 +62,12 @@ class Patient:
         masks : list
             List of mask paths for a tissue.
         """
-        maskpath = os.path.join(self.path, 'MASKS_DICOM')
-        maskpath = os.path.join(maskpath, self.tissue)
+        if self.tissue:
+            maskpath = os.path.join(self.path, 'MASKS_DICOM')
+            maskpath = os.path.join(maskpath, self.tissue)
+        else:
+            maskpath = os.path.join(self.path, 'LABELLED_DICOM')
+
         masks = [os.path.join(maskpath, img) for img in os.listdir(maskpath)]
         # os sorts things lexicographically
         masks = natsorted(masks)
@@ -110,19 +98,6 @@ class Patient:
         dicoms = [pydicom.read_file(dicom) for dicom in self.dicoms]
         slices = [dicom.pixel_array for dicom in dicoms]
         return slices
-
-    def load_labels(self):
-        """
-        Load all masks for a patient.
-
-        Returns
-        -------
-        labels : list of np.arrays
-             All 2D segmentation masks of all labels for a patient.
-        """
-        labels = [pydicom.read_file(label) for label in self.labels]
-        labels = [label.pixel_array for label in labels]
-        return labels
 
     def load_masks(self):
         """
@@ -234,8 +209,7 @@ class IRCAD2D(Dataset):
         self.tissue = tissue
         self.transform = transform
         self.slices = self._load_slices()
-        self.tissue_masks = self._load_masks() if self.tissue else None
-        self.all_masks = self._load_labels() if self.tissue is None else None
+        self.masks = self._load_masks()
 
     def __repr__(self):
         return f'IRCAD 2D liver segmentation'
@@ -258,24 +232,12 @@ class IRCAD2D(Dataset):
             all_slices.extend(patient.load_slices())
         return all_slices
 
-    def _load_labels(self):
-        """
-        Loads all 2D segmentation masks for all tissues in memory.
-
-        Returns
-        -------
-        all_labels : list of np.ndarrays
-            All 2D segmentation masks of all tissues for each patient.
-        """
-        all_labels = []
-        for path in self.ircad.patients:
-            patient = Patient(path)
-            all_labels.extend(patient.load_labels())
-        return all_labels
-
     def _load_masks(self):
         """
-        Loads all 2D segmentation masks for a given tissue in memory.
+        Loads all 2D segmentation masks in memory.
+
+        If a given tissue is specified, then only that tissue mask will
+        be loaded. If no tissue is specified, then all masks will be loaded.
 
         Returns
         -------
@@ -290,11 +252,7 @@ class IRCAD2D(Dataset):
 
     def __getitem__(self, idx):
         img = self.slices[idx]
-
-        if self.tissue:
-            label = self.tissue_masks[idx]
-        else:
-            label = self.all_masks[idx]
+        label = self.masks[idx]
 
         if self.transform is not None:
             img = self.transform(img)
