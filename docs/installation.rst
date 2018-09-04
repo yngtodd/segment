@@ -12,7 +12,7 @@ To install segment, run this command in your terminal:
 
 .. code-block:: console
 
-    pip install segment 
+    pip install medicalsegment 
 
 This is the preferred method to install segment, as it will always install the most recent stable release.
 
