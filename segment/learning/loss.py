@@ -1,30 +1,19 @@
 import torch
+from torch.nn.modules.loss import _Loss
+
+import segment.learning.functional as F
 
 
-def dice_loss(output, target, smooth=1.0):
+class BinaryDiceLoss(_Loss):
     """
-    Dice loss.
-
-    Parameters
-    ----------
-    output : torch tensor
-        Output of model.
-
-    target : torch tensor
-        True mask of the image.
-
-    smooth : float
-        Smoothing factor for edges.
-
-    References
-    ----------
-    https://github.com/pytorch/pytorch/issues/1249
+    Binary Dice Loss.
     """
-    output = torch.sigmoid(output)
+    def __init__(self, weight=None, size_average=None, 
+                 reduce=None, reduction='elementwise_mean'):
+        super(BinaryDiceLoss, self).__init__(size_average, reduce, reduction)
+        self.register_buffer('weight', weight)
 
-    output = output.view(-1)
-    target = target.view(-1)
-    intersection = (output * target).sum()
-    
-    return 1 - ((2. * intersection + smooth) /
-           (output.sum() + target.sum() + smooth))
+    def forward(self, input, target):
+        return F.binary_dice_loss(input, target, weight=self.weight)
+
+
