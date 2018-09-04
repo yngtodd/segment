@@ -54,9 +54,10 @@ def train_valid_split(data, valpercent=.20, random_seed=None):
     Returns
     -------
     train : torch.utils.data.Dataset instance
-        Training set 
+        Training set. 
 
     valid : torch.utils.data.Dataset instance
+        Validation set.
     """
     if random_seed!=None:
         np.random.seed(random_seed)
