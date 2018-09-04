@@ -1,2 +1,2 @@
 from .models.unet import UNet
-from .loss import dice_loss
+from .loss import BinaryDiceLoss 
