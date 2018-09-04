@@ -39,6 +39,9 @@ class AverageMeter:
         self.avgs = np.append(self.avgs, self.avg)
 
     def save(self):
+        if not os.path.exists(self.path):
+            os.makedirs(self.path)
+
         avgpath = os.path.join(self.path, self.name + '_avgs')
         valpath = os.path.join(self.path, self.name + '_vals')
         np.save(avgpath, self.avgs)
