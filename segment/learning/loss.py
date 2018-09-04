@@ -1,7 +1,7 @@
 import torch
 
 
-def dice_loss(output, target):
+def dice_loss(output, target, smooth=1.0):
     """
     Dice loss.
 
@@ -13,12 +13,14 @@ def dice_loss(output, target):
     target : torch tensor
         True mask of the image.
 
+    smooth : float
+        Smoothing factor for edges.
+
     References
     ----------
     https://github.com/pytorch/pytorch/issues/1249
     """
     output = torch.sigmoid(output)
-    smooth = 1.
 
     output = output.view(-1)
     target = target.view(-1)
