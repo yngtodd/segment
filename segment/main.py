@@ -77,7 +77,7 @@ def main():
     model = UNet(n_channels=1, n_classes=1).to(device)
     optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
 
-    dataset = IRCAD2D(args.datapath)
+    dataset = IRCAD2D(args.datapath, 'bone')
     trainset, testset = train_valid_split(dataset)
     
     trainloader = DataLoader(trainset)
