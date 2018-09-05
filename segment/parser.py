@@ -11,9 +11,9 @@ def parse_args():
         Parsed arguments.
     """
     parser = argparse.ArgumentParser(description='Segmentation parameters.')
-    parser.add_argument('-d','--datapath', metavar='DIR', default='/raid/ChestXRay14/images',
+    parser.add_argument('-d','--datapath', metavar='DIR', default='/raid/scratch/hinklejd/3D-IRCADb1',
                         help='path to dataset')
-    parser.add_argument('-mtr','--meterpath', default='/raid/ChestXRay14/images',
+    parser.add_argument('-mtr','--meterpath', default='/home/ygx/experiments/segment',
                         help='path to save meter information')
     parser.add_argument('--batch-size', type=int, default=64, metavar='N',
                         help='input batch size for training (default: 64)')
