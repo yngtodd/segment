@@ -70,12 +70,10 @@ def main():
     optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
 
     dataset = IRCAD2D(args.datapath)
-    train, test = train_valid_split(dataset)
+    trainset, testset = train_valid_split(dataset)
     
-    trainloader = DataLoader(train)
-    testloader = DataLoader(test)
-
-    trainloader = DataLoader(dataset)
+    trainloader = DataLoader(trainset)
+    testloader = DataLoader(testset)
 
     train_meters = {
       'loss': AverageMeter('trainloss', args.meterpath),
