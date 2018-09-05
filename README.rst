@@ -15,10 +15,12 @@
     :target: https://travis-ci.org/yngtodd/segment
 
 
-Segment
--------
+Segment [Legacy]
+----------------
 
 Medical imaging segmentation
+
+Note: this branch keeps legacy code for an older version of the UNet model. This is only preserved in the case we want to support older PyTorch models (and in case the API unexpectedly breaks with the new updates).
 
 For a full introduction to the library, including a brief overview of medical image segmentation, check out our `documentation`_!
 
