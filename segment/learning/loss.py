@@ -15,5 +15,3 @@ class BinaryDiceLoss(_Loss):
 
     def forward(self, input, target):
         return F.binary_dice_loss(input, target, weight=self.weight)
-
-
