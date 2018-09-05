@@ -2,7 +2,6 @@
 Tests for `segment` module.
 """
 import pytest
-from segment import segment
 
 
 class TestSegment(object):
