@@ -28,7 +28,6 @@ def train(args, model, device, train_loader, optimizer, epoch, meters):
         dice = dice_coefficient(output, mask)
         loss.backward()
         optimizer.step()
-
         trainloss.update(loss.item())
         traindice.update(dice)
 
@@ -52,7 +51,6 @@ def test(args, model, device, test_loader, meters):
             output = model(data)
             test_loss += F.binary_cross_entropy_with_logits(output, target, reduction='sum').item()
             dice = dice_coefficient(output, mask)
-
             traindice.update(dice)
 
     test_loss /= len(test_loader.dataset)
