@@ -21,16 +21,9 @@ def train(args, model, device, train_loader, optimizer, epoch, meters):
     for batch_idx, (data, mask) in enumerate(train_loader):
         data = data.unsqueeze(1).float()
         mask = mask.unsqueeze(1).float()
-        data_arry = data.numpy()
-        mask_arry = mask.numpy()
-        print(f'Data min: {data_arry.min()}, Data max: {data_arry.max()}')
-        print(f'Mask min: {mask_arry.min()}, Mask max: {mask_arry.max()}')
         data, mask = data.to(device), mask.to(device)
         optimizer.zero_grad()
         output = model(data)
-        outarry = output.detach().numpy()
-        print(f'\nOutput min: {outarry.min()}, Output max: {outarry.max()}')
-        print(f'Mask min: {mask_arry.min()}, Mask max: {mask_arry.max()}\n')
         loss = F.binary_cross_entropy_with_logits(output, mask)
         dice = dice_coefficient(output, mask)
         loss.backward()
@@ -38,7 +31,6 @@ def train(args, model, device, train_loader, optimizer, epoch, meters):
         trainloss.update(loss.item())
         dice = dice.detach()
         traindice.update(dice)
-        print(f'Dice coefficient: {traindice.val}')
 
         if batch_idx % args.log_interval == 0:
             print('\nTrain Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}, Dice: {:.6f}'.format(
