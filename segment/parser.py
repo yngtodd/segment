@@ -15,8 +15,8 @@ def parse_args():
                         help='path to dataset')
     parser.add_argument('-mtr','--meterpath', default='/home/ygx/experiments/segment',
                         help='path to save meter information')
-    parser.add_argument('--batch-size', type=int, default=64, metavar='N',
-                        help='input batch size for training (default: 64)')
+    parser.add_argument('--batch_size', type=int, default=8, metavar='N',
+                        help='input batch size for training (default: 16)')
     parser.add_argument('--epochs', type=int, default=10, metavar='N',
                         help='number of epochs to train (default: 10)')
     parser.add_argument('--lr', type=float, default=0.01, metavar='LR',

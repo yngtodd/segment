@@ -7,8 +7,8 @@ from segment.data import IRCAD2D
 from segment.data.utils import train_valid_split
 
 from segment.learning import UNet
-from segment.learning import AverageMeter 
-from segment.learning.functional import dice_coefficient 
+from segment.learning import AverageMeter
+from segment.learning.functional import dice_coefficient
 
 from parser import parse_args
 
@@ -56,7 +56,7 @@ def test(args, model, device, test_loader, meters):
     test_loss /= len(test_loader.dataset)
 
     print('\nTest set: Average loss: {:.4f}, Average Dice Coefficient: {:.6f})\n'.format(
-          test_loss, traindice.avg))
+          test_loss, testdice.avg))
 
 
 def main():
@@ -71,9 +71,9 @@ def main():
 
     dataset = IRCAD2D(args.datapath, 'bone')
     trainset, testset = train_valid_split(dataset)
-    
-    trainloader = DataLoader(trainset)
-    testloader = DataLoader(testset)
+
+    trainloader = DataLoader(trainset, batch_size=args.batch_size)
+    testloader = DataLoader(testset, batch_size=args.batch_size)
 
     train_meters = {
       'loss': AverageMeter('trainloss', args.meterpath),
@@ -82,7 +82,7 @@ def main():
 
     test_meters = {
       'loss': AverageMeter('testloss', args.meterpath),
-      'dice': AverageMeter('testdice', args.meterpath)      
+      'dice': AverageMeter('testdice', args.meterpath)
     }
 
     for epoch in range(1, args.epochs + 1):

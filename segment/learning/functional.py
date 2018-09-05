@@ -46,9 +46,9 @@ def dice_coefficient(input, target, smooth=1):
     Compute dice coefficient.
     """
     input = torch.sigmoid(input)
-
-    input = input.view(-1)
-    target = target.view(-1)
+    batch_size = input.size(0)
+    input = input.view(batch_size, -1)
+    target = target.view(batch_size, -1)
     intersection = (input * target).sum()
 
     return ((2. * intersection + smooth) /
