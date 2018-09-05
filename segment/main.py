@@ -13,12 +13,12 @@ from segment.learning.functional import dice_coefficient
 from parser import parse_args
 
 
-def train(args, model, device, trainloader, optimizer, epoch, meters):
+def train(args, model, device, train_loader, optimizer, epoch, meters):
     trainloss = meters['loss']
     traindice = meters['dice']
 
     model.train()
-    for batch_idx, (data, mask) in enumerate(trainloader):
+    for batch_idx, (data, mask) in enumerate(train_loader):
         data = data.unsqueeze(1)
         mask = mask.unsqueeze(1)
         data, target = data.to(device), mask.to(device)
@@ -37,13 +37,13 @@ def train(args, model, device, trainloader, optimizer, epoch, meters):
                   100. * batch_idx / len(train_loader), loss.item()), traindice.avg)
 
 
-def test(args, model, device, testloader, meters):
+def test(args, model, device, test_loader, meters):
     testdice = meters['dice']
 
     model.eval()
     test_loss = 0
     with torch.no_grad():
-        for idx, (data, mask) in enumerate(testloader):
+        for idx, (data, mask) in enumerate(test_loader):
             data = data.unsqueeze(1)
             mask = mask.unsqueeze(1)
             data, target = data.to(device), mask.to(device)
@@ -70,7 +70,7 @@ def main():
 
     dataset = IRCAD2D(args.datapath)
     train, test = train_valid_split(dataset)
-
+    
     trainloader = DataLoader(train)
     testloader = DataLoader(test)
 
