@@ -51,15 +51,14 @@ class Up(nn.Module):
         super(Up, self).__init__()
         #  would be a nice idea if the upsampling could be learned too,
         #  but my machine do not have enough memory to handle all those weights
-        if bilinear:
-            self.up = nn.Upsample(scale_factor=2)
-        else:
-            self.up = nn.ConvTranspose2d(in_ch, out_ch, 2, stride=2)
-
+        self.up = nn.ConvTranspose2d(in_ch, out_ch, 2, stride=2) if bilinear == False else None
         self.conv = DoubleBlock(in_ch, out_ch)
 
     def forward(self, x1, x2):
-        x1 = self.up(x1)
+        if self.up:
+            x1 = self.up(x1)
+        else:
+            x1 = F.interpolate(x1, scale_factor=2)
         diffX = x1.size()[2] - x2.size()[2]
         diffY = x1.size()[3] - x2.size()[3]
         x2 = F.pad(x2, (diffX // 2, int(diffX / 2),
@@ -105,5 +104,5 @@ class UNet(nn.Module):
         x = self.up3(x, x2)
         x = self.up4(x, x1)
         x = self.outconv(x)
-        x = F.sigmoid(x)
+        x = torch.sigmoid(x)
         return x
