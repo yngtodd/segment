@@ -85,8 +85,6 @@ def main():
       'dice': AverageMeter('testdice', args.meterpath)      
     }
 
-    print(f'trainloader is of type {type(trainloader)}')
-
     for epoch in range(1, args.epochs + 1):
         train(args, model, device, trainloader, optimizer, epoch, train_meters)
         test(args, model, device, testloader, test_meters)
