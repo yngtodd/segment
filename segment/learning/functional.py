@@ -73,13 +73,13 @@ def dice_coeff(input, target):
 
     dice = (2. * intersection + smooth) /(pred.sum(1) + truth.sum(1) + smooth)
 
-    return dice.mean().data[0]
+    return dice.mean().item()
 
 
 def jaccard_index(input, target):
     """
     Compute Jaccard index.
-    
+
     References
     ----------
     https://stackoverflow.com/questions/48260415/pytorch-how-to-compute-iou-jaccard-index-for-semantic-segmentation

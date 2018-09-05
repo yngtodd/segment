@@ -29,7 +29,6 @@ def train(args, model, device, train_loader, optimizer, epoch, meters):
         loss.backward()
         optimizer.step()
         trainloss.update(loss.item())
-        dice = dice.detach()
         traindice.update(dice)
 
         if batch_idx % args.log_interval == 0:
