@@ -1,7 +1,7 @@
 import torch
 from torch.nn.modules.loss import _Loss
 
-import segment.learning.functional as F
+from . import functional as F
 
 
 class BinaryDiceLoss(_Loss):

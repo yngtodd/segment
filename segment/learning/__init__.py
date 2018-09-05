@@ -1,3 +1,4 @@
+from .functional import *
 from .loss import BinaryDiceLoss 
 from .meters import AverageMeter
 
