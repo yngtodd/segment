@@ -1,4 +1,5 @@
 import os
+import torch
 import pydicom
 import numpy as np
 
@@ -111,6 +112,12 @@ class Patient:
         masks = [pydicom.read_file(mask) for mask in self.masks]
         masks = [mask.pixel_array for mask in masks]
         return masks
+
+    def create_binary_masks(self):
+        """
+        """
+        for mask in self.masks:
+             
 
 
 class IRCAD:
