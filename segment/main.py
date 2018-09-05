@@ -21,9 +21,16 @@ def train(args, model, device, train_loader, optimizer, epoch, meters):
     for batch_idx, (data, mask) in enumerate(train_loader):
         data = data.unsqueeze(1).float()
         mask = mask.unsqueeze(1).float()
+        data_arry = data.numpy()
+        mask_arry = mask.numpy()
+        print(f'Data min: {data_arry.min()}, Data max: {data_arry.max()}')
+        print(f'Mask min: {mask_arry.min()}, Mask max: {mask_arry.max()}')
         data, mask = data.to(device), mask.to(device)
         optimizer.zero_grad()
         output = model(data)
+        outarry = output.detach().cpu().numpy()
+        print(f'\nOutput min: {outarry.min()}, Output max: {outarry.max()}')
+        print(f'Mask min: {mask_arry.min()}, Mask max: {mask_arry.max()}')
         loss = F.binary_cross_entropy_with_logits(output, mask)
         dice = dice_coeff(output, mask)
         loss.backward()
@@ -69,6 +76,8 @@ def main():
     optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
 
     dataset = IRCAD2D(args.datapath, 'bone')
+    print(dataset)
+    print(f'Segmenting {dataset.tissue}')
     trainset, testset = train_valid_split(dataset)
 
     trainloader = DataLoader(trainset, batch_size=args.batch_size)
