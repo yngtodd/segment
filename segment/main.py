@@ -33,7 +33,7 @@ def train(args, model, device, train_loader, optimizer, epoch, meters):
         traindice.update(dice)
 
         if batch_idx % args.log_interval == 0:
-            print('\nTrain Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}, Dice: {:.6f}'.format(
+            print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}, Dice: {:.6f}'.format(
                   epoch, batch_idx * len(data), len(train_loader.dataset),
                   100. * batch_idx / len(train_loader), loss.item(), traindice.avg))
 
@@ -45,11 +45,11 @@ def test(args, model, device, test_loader, meters):
     test_loss = 0
     with torch.no_grad():
         for idx, (data, mask) in enumerate(test_loader):
-            data = data.unsqueeze(1)
-            mask = mask.unsqueeze(1)
-            data, target = data.to(device), mask.to(device)
+            data = data.unsqueeze(1).float()
+            mask = mask.unsqueeze(1).float()
+            data, mask = data.to(device), mask.to(device)
             output = model(data)
-            test_loss += F.binary_cross_entropy_with_logits(output, target, reduction='sum').item()
+            test_loss += F.binary_cross_entropy_with_logits(output, mask, reduction='sum').item()
             dice = dice_coefficient(output, mask)
             testdice.update(dice)
 
