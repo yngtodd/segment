@@ -53,3 +53,41 @@ def dice_coefficient(input, target, smooth=1):
 
     return ((2. * intersection + smooth) /
            (input.sum() + target.sum() + smooth))
+
+
+def dice_coeff(input, target):
+    """
+    Alternative Dice coefficient
+
+    References
+    ----------
+    https://github.com/pytorch/pytorch/issues/1249
+    """
+    batch_size = input.size(0)
+    smooth = 1.
+
+    pred = input.view(batch_size, -1)
+    truth = target.view(batch_size, -1)
+
+    intersection = (pred * truth).sum(1)
+
+    dice = (2. * intersection + smooth) /(pred.sum(1) + truth.sum(1) + smooth)
+
+    return dice.mean().data[0]
+
+
+def jaccard_index(input, target):
+    """
+    Compute Jaccard index.
+    
+    References
+    ----------
+    https://stackoverflow.com/questions/48260415/pytorch-how-to-compute-iou-jaccard-index-for-semantic-segmentation
+    """
+    intersection = (input*target).long().sum().data.cpu()[0]
+    union = input.long().sum().data.cpu()[0] + target.long().sum().data.cpu()[0] - intersection
+
+    if union == 0:
+        return float('nan')
+    else:
+        return float(intersection) / float(max(union, 1))

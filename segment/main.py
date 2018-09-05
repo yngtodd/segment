@@ -8,7 +8,7 @@ from segment.data.utils import train_valid_split
 
 from segment.learning import UNet
 from segment.learning import AverageMeter 
-from segment.learning.functional import dice_coefficient 
+from segment.learning.functional import dice_coeff
 
 from parser import parse_args
 
@@ -25,7 +25,7 @@ def train(args, model, device, train_loader, optimizer, epoch, meters):
         optimizer.zero_grad()
         output = model(data)
         loss = F.binary_cross_entropy_with_logits(output, mask)
-        dice = dice_coefficient(output, mask)
+        dice = dice_coeff(output, mask)
         loss.backward()
         optimizer.step()
         trainloss.update(loss.item())
@@ -50,7 +50,7 @@ def test(args, model, device, test_loader, meters):
             data, mask = data.to(device), mask.to(device)
             output = model(data)
             test_loss += F.binary_cross_entropy_with_logits(output, mask, reduction='sum').item()
-            dice = dice_coefficient(output, mask)
+            dice = dice_coeff(output, mask)
             testdice.update(dice)
 
     test_loss /= len(test_loader.dataset)
