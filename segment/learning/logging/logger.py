@@ -1,8 +1,8 @@
 import scipy.misc
 import numpy as np
-import tensorflow as tf
 
 from io import BytesIO
+import tensorflow as tf
 
 
 class Logger(object):
