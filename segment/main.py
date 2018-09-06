@@ -68,7 +68,7 @@ def main():
     model = UNet(n_channels=1, n_classes=1).to(device)
     optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
 
-    dataset = IRCAD2D(args.datapath, tissue='bone', binarymask=True)
+    dataset = IRCAD2D(args.datapath, tissue='liver', binarymask=True)
     print(dataset)
     print(f'Segmenting {dataset.tissue}')
     trainset, testset = train_valid_split(dataset)
