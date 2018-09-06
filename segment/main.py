@@ -8,6 +8,7 @@ from segment.data.utils import train_valid_split
 
 from segment.learning import UNet
 from segment.learning import AverageMeter
+from segment.learning.logging import Logger
 from segment.learning.functional import dice_coeff
 from parser import parse_args
 
