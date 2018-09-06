@@ -13,9 +13,6 @@ from segment.learning.functional import dice_coeff
 from parser import parse_args
 
 
-logger = Logger('./logs/learning/logs')
-
-
 def train(args, model, device, train_loader, optimizer, epoch, meters):
     trainloss = meters['loss']
     traindice = meters['dice']
@@ -27,7 +24,6 @@ def train(args, model, device, train_loader, optimizer, epoch, meters):
         data, mask = data.to(device), mask.to(device)
         optimizer.zero_grad()
         output = model(data)
-        print(f'Output has shape {output.shape}')
         loss = F.binary_cross_entropy_with_logits(output, mask)
         dice = dice_coeff(output, mask)
         loss.backward()
@@ -50,7 +46,9 @@ def train(args, model, device, train_loader, optimizer, epoch, meters):
                 logger.histo_summary(tag, value.data.cpu().numpy(), epoch)
                 logger.histo_summary(tag+'/grad', value.grad.data.cpu().numpy(), epoch)
 
-            info = { 'segmentations': output.view(-1, 512, 512)[:10].cpu().numpy() }
+            imgs = output.squeeze(1)
+            imgs = output.view(-1, 512, 512)[:10].detach().cpu().numpy()
+            info = { 'segmentations': imgs }
 
             for tag, images in info.items():
                 logger.image_summary(tag, images, epoch)
@@ -63,7 +61,7 @@ def test(args, model, device, test_loader, meters):
     model.eval()
     test_loss = 0
     with torch.no_grad():
-        for idx, (data, mask) in enumerate(test_loader):
+        for batch_idx, (data, mask) in enumerate(test_loader):
             data = data.unsqueeze(1).float()
             mask = mask.unsqueeze(1).float()
             data, mask = data.to(device), mask.to(device)
@@ -88,6 +86,9 @@ def test(args, model, device, test_loader, meters):
 
 def main():
     args = parse_args()
+
+    global logger
+    logger = Logger(args.logpath)
 
     torch.manual_seed(args.seed)
     use_cuda = not args.no_cuda and torch.cuda.is_available()
