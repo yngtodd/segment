@@ -121,7 +121,7 @@ class Patient:
                 raise ValueError(f'Binary masks are not supported for multiple masks!')
 
             masks = [torch.tensor(mask) for mask in masks]
-            ones = torch.ones_like(masks)
+            ones = torch.ones_like(masks[0])
             masks = [torch.where(mask > 0, ones, mask) for mask in masks]
 
         return masks
@@ -218,9 +218,10 @@ class IRCAD2D(Dataset):
     ----------
     https://www.ircad.fr/research/3d-ircadb-01/
     """
-    def __init__(self, path, tissue=None, transform=None):
+    def __init__(self, path, tissue=None, binarymask=False, transform=None):
         self.ircad = IRCAD(path)
         self.tissue = tissue
+        self.binarymask = binarymask
         self.transform = transform
         self.slices = self._load_slices()
         self.masks = self._load_masks()
@@ -260,7 +261,7 @@ class IRCAD2D(Dataset):
         """
         all_masks = []
         for path in self.ircad.patients:
-            patient = Patient(path, self.tissue)
+            patient = Patient(path, self.tissue, self.binarymask)
             all_masks.extend(patient.load_masks())
         return all_masks
 
