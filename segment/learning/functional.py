@@ -41,21 +41,7 @@ def binary_dice_loss(input, target, smooth=1, weight=None):
     return loss
 
 
-def dice_coefficient(input, target, smooth=1):
-    """
-    Compute dice coefficient.
-    """
-    input = torch.sigmoid(input)
-    batch_size = input.size(0)
-    input = input.view(batch_size, -1)
-    target = target.view(batch_size, -1)
-    intersection = (input * target).sum()
-
-    return ((2. * intersection + smooth) /
-           (input.sum() + target.sum() + smooth))
-
-
-def dice_coeff(input, target):
+def dice_coefficient(input, target):
     """
     Alternative Dice coefficient
 
