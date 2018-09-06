@@ -47,7 +47,7 @@ def train(args, model, device, train_loader, optimizer, epoch, meters):
                 logger.histo_summary(tag+'/grad', value.grad.data.cpu().numpy(), epoch)
 
             imgs = output.squeeze(1)
-            imgs = output.view(-1, 512, 512)[:10].detach().cpu().numpy()
+            imgs = output.view(-1, 512, 512)[:2].detach().cpu().numpy()
             info = { 'segmentations': imgs }
 
             for tag, images in info.items():
@@ -80,7 +80,7 @@ def test(args, model, device, test_loader, meters):
 
     test_loss /= len(test_loader.dataset)
 
-    print('\nTest set: Average loss: {:.4f}, Average Dice Coefficient: {:.6f})\n'.format(
+    print('\nTest set: Average loss: {:.4f}, Average Dice Coefficient: {:.6f}\n'.format(
           testloss.avg, testdice.avg))
 
 
