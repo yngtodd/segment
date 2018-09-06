@@ -91,3 +91,28 @@ def jaccard_index(input, target):
         return float('nan')
     else:
         return float(intersection) / float(max(union, 1))
+
+
+def iou_pytorch(output: torch.Tensor, target: torch.Tensor):
+    """
+    Compute intersection of unions.
+
+    Parameters
+    ----------
+    output : torch.Tensor
+        Output from model
+
+    target : torch.Tensor
+        True mask. 
+    """
+    smooth = 1e-6
+    outputs = outputs.squeeze(1)
+    
+    intersection = (output & target).sum((1, 2)).float()
+    union = (output | target).sum((1, 2)).float()         
+    
+    iou = (intersection + smooth) / (union + smooth)
+    
+    thresholded = torch.clamp(20 * (iou - 0.5), 0, 10).ceil() / 10
+
+    return thresholded
