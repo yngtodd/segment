@@ -9,8 +9,10 @@ from segment.data.utils import train_valid_split
 from segment.learning import UNet
 from segment.learning import AverageMeter
 from segment.learning.functional import dice_coeff
-
 from parser import parse_args
+
+
+logger = Logger('./logs/learning/logs')
 
 
 def train(args, model, device, train_loader, optimizer, epoch, meters):
@@ -24,6 +26,7 @@ def train(args, model, device, train_loader, optimizer, epoch, meters):
         data, mask = data.to(device), mask.to(device)
         optimizer.zero_grad()
         output = model(data)
+        print(f'Output has shape {output.shape}')
         loss = F.binary_cross_entropy_with_logits(output, mask)
         dice = dice_coeff(output, mask)
         loss.backward()
@@ -36,8 +39,24 @@ def train(args, model, device, train_loader, optimizer, epoch, meters):
                   epoch, batch_idx * len(data), len(train_loader.dataset),
                   100. * batch_idx / len(train_loader), loss.item(), traindice.avg))
 
+            info = { 'train_loss': loss.item(), 'train_dice': traindice.avg }
+
+            for tag, value in info.items():
+                logger.scalar_summary(tag, value, epoch)
+
+            for tag, value in model.named_parameters():
+                tag = tag.replace('.', '/')
+                logger.histo_summary(tag, value.data.cpu().numpy(), epoch)
+                logger.histo_summary(tag+'/grad', value.grad.data.cpu().numpy(), epoch)
+
+            info = { 'segmentations': output.view(-1, 512, 512)[:10].cpu().numpy() }
+
+            for tag, images in info.items():
+                logger.image_summary(tag, images, epoch)
+
 
 def test(args, model, device, test_loader, meters):
+    testloss = meters['loss']
     testdice = meters['dice']
 
     model.eval()
@@ -48,14 +67,22 @@ def test(args, model, device, test_loader, meters):
             mask = mask.unsqueeze(1).float()
             data, mask = data.to(device), mask.to(device)
             output = model(data)
-            test_loss += F.binary_cross_entropy_with_logits(output, mask, reduction='sum').item()
+            loss = F.binary_cross_entropy_with_logits(output, mask, reduction='sum').item()
+            test_loss += loss
             dice = dice_coeff(output, mask)
             testdice.update(dice)
+            testloss.update(loss)
+
+        if batch_idx % args.log_interval == 0:
+            info = { 'test_loss': loss.item(), 'test_dice': testdice.avg }
+
+            for tag, value in info.items():
+                logger.scalar_summary(tag, value, epoch)
 
     test_loss /= len(test_loader.dataset)
 
     print('\nTest set: Average loss: {:.4f}, Average Dice Coefficient: {:.6f})\n'.format(
-          test_loss, testdice.avg))
+          testloss.avg, testdice.avg))
 
 
 def main():
@@ -92,6 +119,7 @@ def main():
 
     train_meters['loss'].save()
     train_meters['dice'].save()
+    test_meters['loss'].save()
     test_meters['dice'].save()
 
 
