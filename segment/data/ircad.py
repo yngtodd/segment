@@ -23,9 +23,10 @@ class Patient:
     ----------
     https://www.ircad.fr/research/3d-ircadb-01/
     """
-    def __init__(self, path, tissue=None):
+    def __init__(self, path, tissue=None, binarymask=False):
         self.path = path
         self.tissue = tissue
+        self.binarymask = binarymask
         self.dicoms = self._list_dicoms()
         self.masks = self._list_masks()
 
@@ -106,18 +107,24 @@ class Patient:
 
         Returns
         -------
-        labels : list of np.arrays
+        masks : list of np.arrays or torch.tensors
              All 2D segmentation masks of a given tissue for a patient.
+             Note: If using the original masks, they remain in np.arrays.
+             If binary masks are used, they are returned as torch.tensors.
         """
         masks = [pydicom.read_file(mask) for mask in self.masks]
         masks = [mask.pixel_array for mask in masks]
-        return masks
 
-    def create_binary_masks(self):
-        """
-        """
-        for mask in self.masks:
-             
+        if self.binarymask:
+            # Not all masks in IRCAD are binary
+            if not self.tissue:
+                raise ValueError(f'Binary masks are not supported for multiple masks!')
+
+            masks = [torch.tensor(mask) for mask in masks]
+            ones = torch.ones_like(masks)
+            masks = [torch.where(mask > 0, ones, mask) for mask in masks]
+
+        return masks
 
 
 class IRCAD:
