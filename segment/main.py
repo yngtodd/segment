@@ -72,7 +72,6 @@ def test(args, model, device, test_loader, meters):
             testdice.update(dice)
             testloss.update(loss)
 
-        if batch_idx % args.log_interval == 0:
             info = { 'test_loss': loss.item(), 'test_dice': testdice.avg }
 
             for tag, value in info.items():
@@ -97,7 +96,7 @@ def main():
     model = UNet(n_channels=1, n_classes=1).to(device)
     optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
 
-    dataset = IRCAD2D(args.datapath, tissue='liver', binarymask=True)
+    dataset = IRCAD2D(args.datapath, tissue='bone', binarymask=True)
     print(dataset)
     print(f'Segmenting {dataset.tissue}')
     trainset, testset = train_valid_split(dataset)
