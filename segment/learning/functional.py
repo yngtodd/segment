@@ -41,21 +41,7 @@ def binary_dice_loss(input, target, smooth=1, weight=None):
     return loss
 
 
-def dice_coefficient(input, target, smooth=1):
-    """
-    Compute dice coefficient.
-    """
-    input = torch.sigmoid(input)
-    batch_size = input.size(0)
-    input = input.view(batch_size, -1)
-    target = target.view(batch_size, -1)
-    intersection = (input * target).sum()
-
-    return ((2. * intersection + smooth) /
-           (input.sum() + target.sum() + smooth))
-
-
-def dice_coeff(input, target):
+def dice_coefficient(input, target):
     """
     Alternative Dice coefficient
 
@@ -91,3 +77,28 @@ def jaccard_index(input, target):
         return float('nan')
     else:
         return float(intersection) / float(max(union, 1))
+
+
+def iou_pytorch(output: torch.Tensor, target: torch.Tensor):
+    """
+    Compute intersection of unions.
+
+    Parameters
+    ----------
+    output : torch.Tensor
+        Output from model
+
+    target : torch.Tensor
+        True mask.
+    """
+    smooth = 1e-6
+    outputs = outputs.squeeze(1)
+
+    intersection = (output & target).sum((1, 2)).float()
+    union = (output | target).sum((1, 2)).float()
+
+    iou = (intersection + smooth) / (union + smooth)
+
+    thresholded = torch.clamp(20 * (iou - 0.5), 0, 10).ceil() / 10
+
+    return thresholded
