@@ -54,7 +54,7 @@ def train(args, model, device, train_loader, optimizer, epoch, meters):
                 logger.image_summary(tag, images, epoch)
 
 
-def test(args, model, device, test_loader, meters):
+def test(args, model, device, test_loader, meters, epoch):
     testloss = meters['loss']
     testdice = meters['dice']
 
@@ -72,12 +72,7 @@ def test(args, model, device, test_loader, meters):
             testdice.update(dice)
             testloss.update(loss)
 
-<<<<<<< HEAD
-            info = { 'test_loss': loss.item(), 'test_dice': testdice.avg }
-=======
-        if batch_idx % args.log_interval == 0:
-            info = { 'test_loss': testloss.avg, 'test_dice': testdice.avg }
->>>>>>> ca55e711537496e39c50f23a1f8e95291c871972
+            info = { 'test_loss': loss, 'test_dice': testdice.avg }
 
             for tag, value in info.items():
                 logger.scalar_summary(tag, value, epoch)
@@ -101,14 +96,9 @@ def main():
     model = UNet(n_channels=1, n_classes=1).to(device)
     optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
 
-<<<<<<< HEAD
     dataset = IRCAD2D(args.datapath, tissue='bone', binarymask=True)
-    print(dataset)
-=======
-    dataset = IRCAD2D(args.datapath, tissue='liver', binarymask=True)
->>>>>>> ca55e711537496e39c50f23a1f8e95291c871972
     print(f'Segmenting {dataset.tissue}')
-    
+
     trainset, testset = train_valid_split(dataset)
     trainloader = DataLoader(trainset, batch_size=args.batch_size)
     testloader = DataLoader(testset, batch_size=args.batch_size)
@@ -125,7 +115,7 @@ def main():
 
     for epoch in range(1, args.epochs + 1):
         train(args, model, device, trainloader, optimizer, epoch, train_meters)
-        test(args, model, device, testloader, test_meters)
+        test(args, model, device, testloader, test_meters, epoch)
 
     train_meters['loss'].save()
     train_meters['dice'].save()
