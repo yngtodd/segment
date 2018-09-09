@@ -66,7 +66,12 @@ def continuous_dice_coefficient(output, target):
     """
     Continuous version of the Dice coefficient.
     """
-    pass
+    batch_size = output.size(0)
+
+    pred = output.view(batch_size, -1)
+    truth = target.view(batch_size, -1)
+
+    intersection = (pred * truth).sum(1)
 
 
 def jaccard_index(input, target):
