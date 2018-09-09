@@ -43,7 +43,7 @@ def binary_dice_loss(input, target, smooth=1, weight=None):
 
 def dice_coefficient(input, target):
     """
-    Alternative Dice coefficient
+    Compute Dice coefficient
 
     References
     ----------
@@ -60,6 +60,13 @@ def dice_coefficient(input, target):
     dice = (2. * intersection + smooth) /(pred.sum(1) + truth.sum(1) + smooth)
 
     return dice.mean().item()
+
+
+def continuous_dice_coefficient(output, target):
+    """
+    Continuous version of the Dice coefficient.
+    """
+    pass
 
 
 def jaccard_index(input, target):
