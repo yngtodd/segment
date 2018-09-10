@@ -1,3 +1,4 @@
+import math
 import torch
 
 
@@ -43,7 +44,7 @@ def binary_dice_loss(input, target, smooth=1, weight=None):
 
 def dice_coefficient(input, target):
     """
-    Alternative Dice coefficient
+    Compute Dice coefficient
 
     References
     ----------
@@ -60,6 +61,35 @@ def dice_coefficient(input, target):
     dice = (2. * intersection + smooth) /(pred.sum(1) + truth.sum(1) + smooth)
 
     return dice.mean().item()
+
+
+def continuous_dice_coefficient(output, target):
+    """
+    Continuous version of the Dice coefficient.
+
+    References
+    ----------
+    https://www.biorxiv.org/content/biorxiv/early/2018/04/25/306977.full.pdf
+    """
+    pred = torch.sigmoid(output)
+
+    batch_size = output.size(0)
+    pred = pred.view(batch_size, -1)
+    truth = target.view(batch_size, -1)
+
+    pred_size = pred.sum(1)
+    truth_size = truth.sum(1)
+    
+    intersection = (pred * truth).sum(1)
+    
+    if intersection > 0:
+        c =  (intersection / (truth * (1-math.exp(1e3*pred))).sum()).sum()
+    else:
+        c = 1
+
+    continuous_dice = (2 * intersection) / (c * truth_size + pred_size)
+    
+    return continuous_dice
 
 
 def jaccard_index(input, target):
