@@ -1,10 +1,16 @@
 import os
+import warnings
+
 import torch
 import pydicom
 import numpy as np
 
 from natsort import natsorted
 from torch.utils.data import Dataset
+
+
+class ZeroMasksError(Exception):
+    pass
 
 
 class Patient:
@@ -226,6 +232,12 @@ class IRCAD2D(Dataset):
         self.slices = self._load_slices()
         self.masks = self._load_masks()
 
+        if self.tissue and len(self.masks) == 0:
+            raise ZeroMasksError(f'There are no patients that have masks for the tissue: {self.tissue}!')
+
+        if len(self.masks) < 50:
+            warnings.warn(f'There are only {len(self.masks)} masks for {self.tissue}') 
+
     def __repr__(self):
         return f'IRCAD 2D liver segmentation'
 
@@ -261,8 +273,13 @@ class IRCAD2D(Dataset):
         """
         all_masks = []
         for path in self.ircad.patients:
-            patient = Patient(path, self.tissue, self.binarymask)
-            all_masks.extend(patient.load_masks())
+            try:
+                patient = Patient(path, self.tissue, self.binarymask)
+                all_masks.extend(patient.load_masks())
+            except:
+                FileNotFoundError('Patient {path} does not have masks for {self.tissue}')
+                pass 
+
         return all_masks
 
     def __getitem__(self, idx):
