@@ -1,2 +1,2 @@
-from .ircad import IRCAD2D
-from .ircad import IRCAD3D
+from .ircad.ircad import IRCAD2D
+from .ircad.ircad import IRCAD3D
