@@ -144,7 +144,7 @@ class Patient:
              If binary masks are used, they are returned as torch.tensors.
         """
         masks = [pydicom.read_file(mask) for mask in self.masks]
-        masks = [mask.pixel_array for mask in masks]
+        masks = np.stack([mask.pixel_array for mask in masks])
 
         if self.binarymask:
             # Not all masks in IRCAD are binary
@@ -206,7 +206,7 @@ class IRCAD3D(Dataset):
     ----------
     https://www.ircad.fr/research/3d-ircadb-01/
     """
-    def __init__(self, path, transform=None):
+    def __init__(self, path, tissue=None, transform=None):
         self.ircad = IRCAD(path)
         self.transform = transform
 
