@@ -208,6 +208,7 @@ class IRCAD3D(Dataset):
     """
     def __init__(self, path, tissue=None, transform=None):
         self.ircad = IRCAD(path)
+        self.tissue = tissue
         self.transform = transform
 
     def __repr__(self):
@@ -218,7 +219,7 @@ class IRCAD3D(Dataset):
 
     def __getitem__(self, idx):
         patient_path = self.ircad.patients[idx]
-        patient = Patient(patient_path)
+        patient = Patient(patient_path, self.tissue)
         img = patient.load_3d()
         mask = patient.load_masks3D()
 
