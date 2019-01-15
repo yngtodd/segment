@@ -6,10 +6,10 @@ from torch.utils.data import DataLoader
 from segment.data import IRCAD2D
 from segment.data.utils import train_valid_split
 
-from segment.learning import UNet
-from segment.learning import AverageMeter
-from segment.learning.logging import Logger
-from segment.learning.functional import dice_coefficient
+from segment.ml import UNet
+from segment.ml import AverageMeter
+from segment.ml.logging import Logger
+from segment.ml.functional import dice_coefficient
 from parser import parse_args
 
 
