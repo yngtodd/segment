@@ -132,6 +132,31 @@ class Patient:
 
         return masks
 
+    def load_masks3D(self):
+        """
+        Load all masks for a patient.
+
+        Returns
+        -------
+        masks : list of np.arrays or torch.tensors
+             All 2D segmentation masks of a given tissue for a patient.
+             Note: If using the original masks, they remain in np.arrays.
+             If binary masks are used, they are returned as torch.tensors.
+        """
+        masks = [pydicom.read_file(mask) for mask in self.masks]
+        masks = [mask.pixel_array for mask in masks]
+
+        if self.binarymask:
+            # Not all masks in IRCAD are binary
+            if not self.tissue:
+                raise ValueError(f'Binary masks are not supported for multiple masks!')
+
+            masks = [torch.tensor(mask) for mask in masks]
+            ones = torch.ones_like(masks[0])
+            masks = np.stack([torch.where(mask > 0, ones, mask) for mask in masks])
+
+        return masks
+
 
 class IRCAD:
     """
@@ -195,11 +220,12 @@ class IRCAD3D(Dataset):
         patient_path = self.ircad.patients[idx]
         patient = Patient(patient_path)
         img = patient.load_3d()
+        mask = patient.load_masks3D()
 
         if self.transform is not None:
             img = self.transform(img)
 
-        return img
+        return img, mask
 
 
 class IRCAD2D(Dataset):
