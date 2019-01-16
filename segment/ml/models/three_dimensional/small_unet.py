@@ -36,7 +36,7 @@ class Down(nn.Module):
 
     def __init__(self, in_ch, out_ch):
         super(Down, self).__init__()
-        self.pool = nn.MaxPool3d(2, return_indices=True)
+        self.pool = nn.MaxPool3d(2, stride=1, return_indices=True)
         self.block = DoubleBlock(in_ch, out_ch)
 
     def forward(self, x):
@@ -49,7 +49,7 @@ class Up(nn.Module):
 
     def __init__(self, in_ch, out_ch):
         super(Up, self).__init__()
-        self.unpool = nn.MaxUnpool3d(2)
+        self.unpool = nn.MaxUnpool3d(2, stride=1)
         self.block = DoubleBlock(in_ch, out_ch)
 
     def forward(self, x, indices):
@@ -72,16 +72,16 @@ class UNet3D(nn.Module):
 
     def __init__(self, n_channels, n_classes):
         super(UNet3D, self).__init__()
-        self.inconv = InConv(n_channels, 8)
-        self.down1 = Down(8, 16)
-        self.down2 = Down(16, 32)
-        self.down3 = Down(32, 64)
-        self.down4 = Down(64, 128)
-        self.up1 = Up(128, 64)
-        self.up2 = Up(64, 32)
-        self.up3 = Up(32, 16)
-        self.up4 = Up(16, 8)
-        self.outconv = OutConv(8, n_classes)
+        self.inconv = InConv(n_channels, 2)
+        self.down1 = Down(2, 4)
+        self.down2 = Down(4, 8)
+        self.down3 = Down(8, 16)
+        self.down4 = Down(16, 32)
+        self.up1 = Up(32, 16)
+        self.up2 = Up(16, 8)
+        self.up3 = Up(8, 4)
+        self.up4 = Up(4, 2)
+        self.outconv = OutConv(2, n_classes)
 
     def forward(self, x):
         x1 = self.inconv(x)
