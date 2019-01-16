@@ -58,7 +58,6 @@ class Up(nn.Module):
         return x
 
 
-
 class OutConv(nn.Module):
 
     def __init__(self, in_ch, out_ch):
@@ -78,9 +77,9 @@ class UNet3D(nn.Module):
         self.down2 = Down(16, 32)
         self.down3 = Down(32, 64)
         self.down4 = Down(64, 128)
-        self.up1 = Up(256, 32)
-        self.up2 = Up(64, 16)
-        self.up3 = Up(32, 8)
+        self.up1 = Up(128, 64)
+        self.up2 = Up(64, 32)
+        self.up3 = Up(32, 16)
         self.up4 = Up(16, 8)
         self.outconv = OutConv(8, n_classes)
 
