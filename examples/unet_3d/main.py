@@ -22,6 +22,8 @@ def train(args, model, device, train_loader, optimizer, epoch, meters):
     for batch_idx, (data, mask) in enumerate(train_loader):
         data = data.unsqueeze(1).float()
         mask = mask.unsqueeze(1).float()
+#        data.contiguous()
+#        mask.contiguous()
         data, mask = data.to(device), mask.to(device)
         optimizer.zero_grad()
         output = model(data)
@@ -65,6 +67,8 @@ def test(args, model, device, test_loader, meters, epoch):
         for batch_idx, (data, mask) in enumerate(test_loader):
             data = data.unsqueeze(1).float()
             mask = mask.unsqueeze(1).float()
+#            data.contiguous()
+#            mask.contiguous()
             data, mask = data.to(device), mask.to(device)
             output = model(data)
             loss = F.binary_cross_entropy_with_logits(output, mask, reduction='sum').item()
@@ -97,7 +101,7 @@ def main():
     model = UNet3D(n_channels=1, n_classes=1).to(device)
     optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
 
-    dataset = IRCAD3D(args.datapath, tissue='bone', binarymask=True)
+    dataset = IRCAD3D(args.datapath, tissue='bone')
     print(f'Segmenting {dataset.tissue}')
 
     trainset, testset = train_valid_split(dataset)
