@@ -92,7 +92,9 @@ class Patient:
         """
         imgs = [pydicom.read_file(dicom) for dicom in self.dicoms]
         arry = np.stack([img.pixel_array for img in imgs])
-        return arry
+        tensor = torch.tensor(arry)
+        tensor = tensor.unsqueeze(0)
+        return tensor
 
     def load_slices(self):
         """
@@ -145,6 +147,8 @@ class Patient:
         """
         masks = [pydicom.read_file(mask) for mask in self.masks]
         masks = np.stack([mask.pixel_array for mask in masks])
+        masks = torch.tensor(masks)
+        masks = masks.unsqueeze(0)
 
         if self.binarymask:
             # Not all masks in IRCAD are binary
@@ -154,6 +158,7 @@ class Patient:
             masks = [torch.tensor(mask) for mask in masks]
             ones = torch.ones_like(masks[0])
             masks = np.stack([torch.where(mask > 0, ones, mask) for mask in masks])
+            masks = masks.unsqueeze(0)
 
         return masks
 
@@ -263,7 +268,7 @@ class IRCAD2D(Dataset):
             raise ZeroMasksError(f'There are no patients that have masks for the tissue: {self.tissue}!')
 
         if len(self.masks) < 50:
-            warnings.warn(f'There are only {len(self.masks)} masks for {self.tissue}') 
+            warnings.warn(f'There are only {len(self.masks)} masks for {self.tissue}')
 
     def __repr__(self):
         return f'IRCAD 2D liver segmentation'
@@ -305,7 +310,7 @@ class IRCAD2D(Dataset):
                 all_masks.extend(patient.load_masks())
             except:
                 FileNotFoundError('Patient {path} does not have masks for {self.tissue}')
-                pass 
+                pass
 
         return all_masks
 
