@@ -20,10 +20,10 @@ def train(args, model, device, train_loader, optimizer, epoch, meters):
 
     model.train()
     for batch_idx, (data, mask) in enumerate(train_loader):
-        data = data.unsqueeze(1).float()
-        mask = mask.unsqueeze(1).float()
-#        data.contiguous()
-#        mask.contiguous()
+        #data = data.unsqueeze(1).float()
+        #mask = mask.unsqueeze(1).float()
+        data = data.float()
+        mask = mask.float()
         data, mask = data.to(device), mask.to(device)
         optimizer.zero_grad()
         output = model(data)
