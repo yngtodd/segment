@@ -93,7 +93,7 @@ class Patient:
         imgs = [pydicom.read_file(dicom) for dicom in self.dicoms]
         arry = np.stack([img.pixel_array for img in imgs])
         tensor = torch.tensor(arry)
-        tensor = tensor.unsqueeze(1)
+#        tensor = tensor.unsqueeze(1)
         return tensor
 
     def load_slices(self):
@@ -108,7 +108,7 @@ class Patient:
         dicoms = [pydicom.read_file(dicom) for dicom in self.dicoms]
         slices = [dicom.pixel_array for dicom in dicoms]
         slices = torch.tensor(slices)
-        slices = slices.unsqueeze(1)
+        #slices = slices.unsqueeze(1)
         return slices
 
     def load_masks(self):
@@ -125,7 +125,7 @@ class Patient:
         masks = [pydicom.read_file(mask) for mask in self.masks]
         masks = [mask.pixel_array for mask in masks]
         masks = torch.tensor(masks)
-        masks = masks.unsqueeze(1)
+#        masks = masks.unsqueeze(1)
 
         if self.binarymask:
             # Not all masks in IRCAD are binary
@@ -135,7 +135,7 @@ class Patient:
             masks = [torch.tensor(mask) for mask in masks]
             ones = torch.ones_like(masks[0])
             masks = [torch.where(mask > 0, ones, mask) for mask in masks]
-            masks = masks.unsqueeze(1)
+#            masks = masks.unsqueeze(1)
 
         return masks
 
@@ -153,7 +153,7 @@ class Patient:
         masks = [pydicom.read_file(mask) for mask in self.masks]
         masks = np.stack([mask.pixel_array for mask in masks])
         masks = torch.tensor(masks)
-        masks = masks.unsqueeze(1)
+#        masks = masks.unsqueeze(1)
 
         if self.binarymask:
             # Not all masks in IRCAD are binary
@@ -163,7 +163,7 @@ class Patient:
             masks = [torch.tensor(mask) for mask in masks]
             ones = torch.ones_like(masks[0])
             masks = np.stack([torch.where(mask > 0, ones, mask) for mask in masks])
-            masks = masks.unsqueeze(1)
+#            masks = masks.unsqueeze(1)
 
         return masks
 

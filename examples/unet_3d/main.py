@@ -6,7 +6,7 @@ from torch.utils.data import DataLoader
 from segment.data import IRCAD3D
 from segment.data.utils import train_valid_split
 
-from segment.ml.models.three_dimensional.small_unet import UNet3D
+from segment.ml.models.three_dimensional.mp_unet import UNet3D
 from segment.ml import AverageMeter
 from segment.ml.logging import Logger
 from segment.ml.functional import dice_coefficient
@@ -20,10 +20,10 @@ def train(args, model, device, train_loader, optimizer, epoch, meters):
 
     model.train()
     for batch_idx, (data, mask) in enumerate(train_loader):
-        #data = data.unsqueeze(1).float()
-        #mask = mask.unsqueeze(1).float()
-        data = data.float()
-        mask = mask.float()
+        data = data.unsqueeze(1).float()
+        mask = mask.unsqueeze(1).float()
+        #data = data.float()
+        #mask = mask.float()
         data, mask = data.to(device), mask.to(device)
         optimizer.zero_grad()
         output = model(data)
@@ -67,6 +67,8 @@ def test(args, model, device, test_loader, meters, epoch):
         for batch_idx, (data, mask) in enumerate(test_loader):
             data = data.unsqueeze(1).float()
             mask = mask.unsqueeze(1).float()
+            #data = data.float()
+            #mask = mask.float()
 #            data.contiguous()
 #            mask.contiguous()
             data, mask = data.to(device), mask.to(device)
@@ -96,7 +98,7 @@ def main():
 
     torch.manual_seed(args.seed)
     use_cuda = not args.no_cuda and torch.cuda.is_available()
-    device = torch.device("cuda:2" if use_cuda else "cpu")
+    device = torch.device("cuda:1" if use_cuda else "cpu")
 
     model = UNet3D(n_channels=1, n_classes=1).to(device)
     optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
