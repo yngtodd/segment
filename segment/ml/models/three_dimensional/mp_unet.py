@@ -72,32 +72,42 @@ class UNet3D(nn.Module):
 
     def __init__(self, n_channels, n_classes):
         super(UNet3D, self).__init__()
-        self.inconv = InConv(n_channels, 2).to('cuda:1')
-        self.down1 = Down(2, 4).to('cuda:1')
+        self.inconv = InConv(n_channels, 2).to('cuda:0')
+        self.down1 = Down(2, 4).to('cuda:0')
         self.down2 = Down(4, 8).to('cuda:1')
-        self.down3 = Down(8, 16).to('cuda:2')
-        self.down4 = Down(16, 32).to('cuda:3')
-        self.up1 = Up(32, 16).to('cuda:2')
+        self.down3 = Down(8, 16).to('cuda:1')
+        self.down4 = Down(16, 32).to('cuda:2')
+        self.up1 = Up(32, 16).to('cuda:3')
         self.up2 = Up(16, 8).to('cuda:1')
         self.up3 = Up(8, 4).to('cuda:1')
-        self.up4 = Up(4, 2).to('cuda:1')
-        self.outconv = OutConv(2, n_classes).to('cuda:1')
+        self.up4 = Up(4, 2).to('cuda:0')
+        self.outconv = OutConv(2, n_classes).to('cuda:0')
 
     def forward(self, x):
-        x1 = self.inconv(x)
-        x2, indices2 = self.down1(x1)
-        x3, indices3 = self.down2(x2)
-        x3 = x3.to('cuda:2')
-        x4, indices4 = self.down3(x3)
-        x4, indices4 = x4.to('cuda:3'), indices4.to('cuda:1')
-        x5, indices5 = self.down4(x4)
-        x5, indices5 = x5.to('cuda:2'), indices5.to('cuda:2')
+        x = self.inconv(x)
+        x, indices1 = self.down1(x)
 
-        x = self.up1(x5, indices5)
+        # First transfer
         x = x.to('cuda:1')
-        x = self.up2(x, indices4)
-        x = self.up3(x, indices3)
-        x = self.up4(x, indices2)
+        x, indices2 = self.down2(x)
+        x, indices3 = self.down3(x)
+
+        # Second transfer
+        x = x.to('cuda:2')
+        x, indices4 = self.down4(x)
+
+        # Third transfer
+        x, indices4 = x.to('cuda:3'), indices4.to('cuda:3')
+        x = self.up1(x, indices4)
+
+        # Fourth transfer
+        x = x.to('cuda:1')
+        x = self.up2(x, indices3)
+        x = self.up3(x, indices2)
+
+        # Fifth transfer
+        x = x.to('cuda:0')
+        x = self.up4(x, indices1)
         x = self.outconv(x)
         x = torch.sigmoid(x)
         return x
