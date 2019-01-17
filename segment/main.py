@@ -6,7 +6,7 @@ from torch.utils.data import DataLoader
 from segment.data import IRCAD2D
 from segment.data.utils import train_valid_split
 
-from segment.ml import UNet
+from segment.ml import UNet2D
 from segment.ml import AverageMeter
 from segment.ml.logging import Logger
 from segment.ml.functional import dice_coefficient
@@ -19,8 +19,8 @@ def train(args, model, device, train_loader, optimizer, epoch, meters):
 
     model.train()
     for batch_idx, (data, mask) in enumerate(train_loader):
-        data = data.unsqueeze(1).float()
-        mask = mask.unsqueeze(1).float()
+        data = data.float()
+        mask = mask.float()
         data, mask = data.to(device), mask.to(device)
         optimizer.zero_grad()
         output = model(data)
@@ -62,8 +62,8 @@ def test(args, model, device, test_loader, meters, epoch):
     test_loss = 0
     with torch.no_grad():
         for batch_idx, (data, mask) in enumerate(test_loader):
-            data = data.unsqueeze(1).float()
-            mask = mask.unsqueeze(1).float()
+            data = data.float()
+            mask = mask.float()
             data, mask = data.to(device), mask.to(device)
             output = model(data)
             loss = F.binary_cross_entropy_with_logits(output, mask, reduction='sum').item()
@@ -93,7 +93,7 @@ def main():
     use_cuda = not args.no_cuda and torch.cuda.is_available()
     device = torch.device("cuda" if use_cuda else "cpu")
 
-    model = UNet(n_channels=1, n_classes=1).to(device)
+    model = UNet2D(n_channels=1, n_classes=1).to(device)
     optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
 
     dataset = IRCAD2D(args.datapath, tissue='bone', binarymask=True)
