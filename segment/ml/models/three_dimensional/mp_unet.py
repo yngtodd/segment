@@ -36,7 +36,7 @@ class Down(nn.Module):
 
     def __init__(self, in_ch, out_ch):
         super(Down, self).__init__()
-        self.pool = nn.MaxPool3d(2, stride=1, return_indices=True)
+        self.pool = nn.MaxPool3d(2, return_indices=True)
         self.block = DoubleBlock(in_ch, out_ch)
 
     def forward(self, x):
@@ -49,11 +49,11 @@ class Up(nn.Module):
 
     def __init__(self, in_ch, out_ch):
         super(Up, self).__init__()
-        self.unpool = nn.MaxUnpool3d(2, stride=1)
+        self.unpool = nn.MaxUnpool3d(2)
         self.block = DoubleBlock(in_ch, out_ch)
 
-    def forward(self, x, indices):
-        x = self.unpool(x, indices)
+    def forward(self, x, indices, output_shape):
+        x = self.unpool(x, indices, output_shape)
         x = self.block(x)
         return x
 
@@ -85,29 +85,40 @@ class UNet3D(nn.Module):
 
     def forward(self, x):
         x = self.inconv(x)
-        x, indices1 = self.down1(x)
+        xshape = x.shape
+        print(f'xshape: {xshape}')
+        x1, indices1 = self.down1(x)
+        x1shape = x1.shape
+        print(f'x1shape: {x1shape}')
 
         # First transfer
-        x = x.to('cuda:1')
-        x, indices2 = self.down2(x)
-        x, indices3 = self.down3(x)
+        x1 = x1.to('cuda:1')
+        x2, indices2 = self.down2(x1)
+        x2shape = x2.shape
+        print(f'x2shape: {x2shape}')
+        x3, indices3 = self.down3(x2)
+        x3shape = x3.shape
+        print(f'x3shape: {x3shape}')
 
         # Second transfer
-        x = x.to('cuda:2')
-        x, indices4 = self.down4(x)
+        x3 = x3.to('cuda:2')
+        x4, indices4 = self.down4(x3)
+        x4shape = x4.shape
+        print(f'x4shape: {x4shape}')
 
         # Third transfer
-        x, indices4 = x.to('cuda:3'), indices4.to('cuda:3')
-        x = self.up1(x, indices4)
+        x4, indices4 = x4.to('cuda:3'), indices4.to('cuda:3')
+        x5 = self.up1(x4, indices4, x4shape)
+        print('pass')
 
         # Fourth transfer
-        x = x.to('cuda:1')
-        x = self.up2(x, indices3)
-        x = self.up3(x, indices2)
+        x5 = x4.to('cuda:1')
+        x5 = self.up2(x5, indices3, x3shape)
+        x5 = self.up3(x5, indices2, x2shape)
 
         # Fifth transfer
-        x = x.to('cuda:0')
-        x = self.up4(x, indices1)
-        x = self.outconv(x)
-        x = torch.sigmoid(x)
-        return x
+        x6 = x5.to('cuda:0')
+        x6 = self.up4(x6, indices1, x1shape)
+        x6 = self.outconv(x6)
+        x6 = torch.sigmoid(x6)
+        return x6
