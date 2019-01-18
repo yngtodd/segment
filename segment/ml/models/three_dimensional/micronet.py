@@ -73,16 +73,10 @@ class UNet3D(nn.Module):
 
     def __init__(self, n_channels, n_classes):
         super(UNet3D, self).__init__()
-        self.inconv = InConv(n_channels, 2).to('cuda:0')
-        self.down1 = Down(2, 4).to('cuda:0')
-        self.down2 = Down(4, 8).to('cuda:1')
-        self.down3 = Down(8, 16).to('cuda:1')
-        self.down4 = Down(16, 32).to('cuda:2')
-        self.up1 = Up(32, 16).to('cuda:3')
-        self.up2 = Up(16, 8).to('cuda:1')
-        self.up3 = Up(8, 4).to('cuda:1')
-        self.up4 = Up(4, 2).to('cuda:0')
-        self.outconv = OutConv(2, n_classes).to('cuda:0')
+        self.inconv = InConv(n_channels, 2)
+        self.down1 = Down(2, 4)
+        self.up1 = Up(4, 2)
+        self.outconv = OutConv(2, n_classes)
 
     def forward(self, x):
         x = self.inconv(x)
@@ -93,37 +87,11 @@ class UNet3D(nn.Module):
         print(f'x1shape: {x1shape}')
         print(f'indices1: {indices1.shape}')
 
-        # First transfer
-        x1 = x1.to('cuda:1')
-        x2, indices2, x2shape = self.down2(x1)
-        #x2shape = x2.shape
-        print(f'x2shape: {x2shape}')
-        print(f'indices2: {indices2.shape}')
-        x3, indices3, x3shape = self.down3(x2)
-        #x3shape = x3.shape
-        print(f'x3shape: {x3shape}')
-        print(f'indices3: {indices3.shape}')
-
-        # Second transfer
-        x3 = x3.to('cuda:2')
-        x4, indices4, x4shape = self.down4(x3)
-        #x4shape = x4.shape
-        print(f'x4shape: {x4shape}')
-        print(f'indices4: {indices4.shape}')
-
         # Third transfer
-        x4, indices4 = x4.to('cuda:3'), indices4.to('cuda:3')
-        x5 = self.up1(x4, indices4, output_shape=x4shape)
+        #x4, indices4 = x4.to('cuda:3'), indices4.to('cuda:3')
+        x2 = self.up1(x1, indices1, output_shape=x1shape)
         print('pass')
 
-        # Fourth transfer
-        x5 = x4.to('cuda:1')
-        x5 = self.up2(x5, indices3, x3shape)
-        x5 = self.up3(x5, indices2, x2shape)
-
-        # Fifth transfer
-        x6 = x5.to('cuda:0')
-        x6 = self.up4(x6, indices1, x1shape)
-        x6 = self.outconv(x6)
-        x6 = torch.sigmoid(x6)
+        x3 = self.outconv(x2)
+        x3 = torch.sigmoid(x3)
         return x6
