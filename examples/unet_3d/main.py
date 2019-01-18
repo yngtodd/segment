@@ -15,8 +15,8 @@ from segment.ml.functional import dice_coefficient
 from parser import parse_args
 
 
-downsample_img = nn.AvgPool3d(4)
-downsample_mask = nn.MaxPool3d(4)
+downsample_img = nn.AvgPool3d(2)
+downsample_mask = nn.MaxPool3d(2)
 
 
 def train(args, model, device, train_loader, optimizer, epoch, meters):

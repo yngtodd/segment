@@ -36,25 +36,26 @@ class Down(nn.Module):
 
     def __init__(self, in_ch, out_ch):
         super(Down, self).__init__()
-        self.pool = nn.MaxPool3d(2, return_indices=True)
+        self.pool = nn.MaxPool3d(3, stride=2, return_indices=True)
         self.block = DoubleBlock(in_ch, out_ch)
 
     def forward(self, x):
-        x, indices = self.pool(x)
+        shape = x.shape
         x = self.block(x)
-        return x, indices
+        x, indices = self.pool(x)
+        return x, indices, shape
 
 
 class Up(nn.Module):
 
     def __init__(self, in_ch, out_ch):
         super(Up, self).__init__()
-        self.unpool = nn.MaxUnpool3d(2)
+        self.unpool = nn.MaxUnpool3d(3, stride=2)
         self.block = DoubleBlock(in_ch, out_ch)
 
     def forward(self, x, indices, output_shape):
-        x = self.unpool(x, indices, output_shape)
         x = self.block(x)
+        x = self.unpool(x, indices, output_shape)
         return x
 
 
@@ -85,30 +86,34 @@ class UNet3D(nn.Module):
 
     def forward(self, x):
         x = self.inconv(x)
-        xshape = x.shape
-        print(f'xshape: {xshape}')
-        x1, indices1 = self.down1(x)
-        x1shape = x1.shape
+        #xshape = x.shape
+        #print(f'xshape: {xshape}')
+        x1, indices1, x1shape = self.down1(x)
+        #x1shape = x1.shape
         print(f'x1shape: {x1shape}')
+        print(f'indices1: {indices1.shape}')
 
         # First transfer
         x1 = x1.to('cuda:1')
-        x2, indices2 = self.down2(x1)
-        x2shape = x2.shape
+        x2, indices2, x2shape = self.down2(x1)
+        #x2shape = x2.shape
         print(f'x2shape: {x2shape}')
-        x3, indices3 = self.down3(x2)
-        x3shape = x3.shape
+        print(f'indices2: {indices2.shape}')
+        x3, indices3, x3shape = self.down3(x2)
+        #x3shape = x3.shape
         print(f'x3shape: {x3shape}')
+        print(f'indices3: {indices3.shape}')
 
         # Second transfer
         x3 = x3.to('cuda:2')
-        x4, indices4 = self.down4(x3)
-        x4shape = x4.shape
+        x4, indices4, x4shape = self.down4(x3)
+        #x4shape = x4.shape
         print(f'x4shape: {x4shape}')
+        print(f'indices4: {indices4.shape}')
 
         # Third transfer
         x4, indices4 = x4.to('cuda:3'), indices4.to('cuda:3')
-        x5 = self.up1(x4, indices4, x4shape)
+        x5 = self.up1(x4, indices4, output_shape=x4shape)
         print('pass')
 
         # Fourth transfer
