@@ -100,15 +100,11 @@ def main():
     logger = Logger(args.logpath)
 
     torch.manual_seed(args.seed)
-    use_cuda = not args.no_cuda and torch.cuda.is_available()
-    device = torch.device("cuda" if use_cuda else "cpu")
-    print(f'device: {device}')
 
-    if device == "cuda":
-        start_gpu = f'cuda:{args.start_gpu}'
-        end_gpu = f'cuda:{args.end_gpu}'
-        print(f'Start GPU: {start_gpu}')
-        print(f'End GPU: {end_gpu}')
+    start_gpu = f'cuda:{args.start_gpu}'
+    end_gpu = f'cuda:{args.end_gpu}'
+    print(f'Start GPU: {start_gpu}')
+    print(f'End GPU: {end_gpu}')
 
     model = MicroUNet3D(n_channels=1, n_classes=1)
     optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)

@@ -25,8 +25,6 @@ def parse_args():
                         help='learning rate (default: 0.01)')
     parser.add_argument('--momentum', type=float, default=0.5, metavar='M',
                         help='SGD momentum (default: 0.5)')
-    parser.add_argument('--no-cuda', action='store_true', default=False,
-                        help='disables CUDA training')
     parser.add_argument('--start_gpu', type=int, default=0, metavar='S',
                          help='First GPU to use. (default: 0)')
     parser.add_argument('--end_gpu', type=int, default=1, metavar='E',
