@@ -68,7 +68,7 @@ class OutConv(nn.Module):
         return self.conv(x)
 
 
-class MicroUnet3D(nn.Module):
+class MicroUNet3D(nn.Module):
 
     def __init__(self, n_channels, n_classes):
         super(MicroUnet3D, self).__init__()
