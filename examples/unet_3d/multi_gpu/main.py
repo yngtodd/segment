@@ -19,7 +19,7 @@ downsample_img = nn.AvgPool3d(2)
 downsample_mask = nn.MaxPool3d(2)
 
 
-def train(args, model, device, train_loader, optimizer, epoch, meters):
+def train(args, model, start_gpu, end_gpu, train_loader, optimizer, epoch, meters):
     trainloss = meters['loss']
     traindice = meters['dice']
 
@@ -62,7 +62,7 @@ def train(args, model, device, train_loader, optimizer, epoch, meters):
                 logger.image_summary(tag, images, epoch)
 
 
-def test(args, model, device, test_loader, meters, epoch):
+def test(args, model, start_gpu, end_gpu, test_loader, meters, epoch):
     testloss = meters['loss']
     testdice = meters['dice']
 
@@ -127,8 +127,8 @@ def main():
     }
 
     for epoch in range(1, args.epochs + 1):
-        train(args, model, device, trainloader, optimizer, epoch, train_meters)
-        test(args, model, device, testloader, test_meters, epoch)
+        train(args, model, start_gpu, end_gpu, trainloader, optimizer, epoch, train_meters)
+        test(args, model, start_gpu, end_gpu, testloader, test_meters, epoch)
 
     train_meters['loss'].save()
     train_meters['dice'].save()
