@@ -7,7 +7,7 @@ from torch.utils.data import DataLoader
 from segment.data import IRCAD3D
 from segment.data.utils import train_valid_split
 
-from segment.ml.models.three_dimensional.mp_unet import UNet3D
+from segment.ml.models.three_dimensional.multi_micronet import UNet3D
 from segment.ml import AverageMeter
 from segment.ml.logging import Logger
 from segment.ml.functional import dice_coefficient
