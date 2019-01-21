@@ -71,7 +71,7 @@ class OutConv(nn.Module):
 class MicroUNet3D(nn.Module):
 
     def __init__(self, n_channels, n_classes):
-        super(MicroUnet3D, self).__init__()
+        super(MicroUNet3D, self).__init__()
         self.inconv = InConv(n_channels, 2).to('cuda:0')
         self.down1 = Down(2, 4).to('cuda:0')
         self.down2 = Down(4, 8).to('cuda:0')
