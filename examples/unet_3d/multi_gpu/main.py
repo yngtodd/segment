@@ -27,8 +27,8 @@ def train(args, model, device, train_loader, optimizer, epoch, meters):
     for batch_idx, (data, mask) in enumerate(train_loader):
         data = data.unsqueeze(1).float()
         mask = mask.unsqueeze(1).float()
-        data = downsample_img(data)
-        mask = downsample_mask(mask)
+        #data = downsample_img(data)
+        #mask = downsample_mask(mask)
         data, mask = data.to(start_gpu), mask.to(end_gpu)
         optimizer.zero_grad()
         output = model(data)
@@ -72,8 +72,8 @@ def test(args, model, device, test_loader, meters, epoch):
         for batch_idx, (data, mask) in enumerate(test_loader):
             data = data.unsqueeze(1).float()
             mask = mask.unsqueeze(1).float()
-            data = downsample_img(data)
-            mask = downsample_mask(mask)
+            #data = downsample_img(data)
+            #mask = downsample_mask(mask)
             data, mask = data.to(start_gpu), mask.to(end_gpu)
             output = model(data)
             loss = F.binary_cross_entropy_with_logits(output, mask, reduction='sum').item()
