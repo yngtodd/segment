@@ -55,8 +55,9 @@ def train(args, model, start_gpu, end_gpu, train_loader, optimizer, epoch, meter
                 logger.histo_summary(tag+'/grad', value.grad.data.cpu().numpy(), epoch)
 
             imgs = output.squeeze(1)
-            imgs = output.view(-1, 512, 512)[:2].detach().cpu().numpy()
-            info = { 'segmentations': imgs }
+            print(f'Output shape: {imgs.shape}')
+            #imgs = output.view(-1, 512, 512)[:2].detach().cpu().numpy()
+            #info = { 'segmentations': imgs }
 
             for tag, images in info.items():
                 logger.image_summary(tag, images, epoch)
