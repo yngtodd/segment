@@ -86,9 +86,9 @@ class MicroUnet3D(nn.Module):
         x3, indices2 = self.down2(x2)
 
         # Transfer to next GPU.
-        x2, indices1= x2.to('cuda:1'), indices1.to('cuda:1')
-        x3, indices2 x3.to('cuda:1'), indices2.to('cuda:1')
-        
+        x2, indices1 = x2.to('cuda:1'), indices1.to('cuda:1')
+        x3, indices2 = x3.to('cuda:1'), indices2.to('cuda:1')
+
         x4 = self.up1(x3, indices2, x2.shape)
         x5 = self.up2(x4, indices1, x1.shape)
         x6 = self.outconv(x5)
