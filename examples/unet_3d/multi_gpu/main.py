@@ -27,8 +27,8 @@ def train(args, model, start_gpu, end_gpu, train_loader, optimizer, epoch, meter
     for batch_idx, (data, mask) in enumerate(train_loader):
         data = data.unsqueeze(1).float()
         mask = mask.unsqueeze(1).float()
-        #data = downsample_img(data)
-        #mask = downsample_mask(mask)
+        data = downsample_img(data)
+        mask = downsample_mask(mask)
         data, mask = data.to(start_gpu), mask.to(end_gpu)
         optimizer.zero_grad()
         output = model(data)
@@ -72,8 +72,8 @@ def test(args, model, start_gpu, end_gpu, test_loader, meters, epoch):
         for batch_idx, (data, mask) in enumerate(test_loader):
             data = data.unsqueeze(1).float()
             mask = mask.unsqueeze(1).float()
-            #data = downsample_img(data)
-            #mask = downsample_mask(mask)
+            data = downsample_img(data)
+            mask = downsample_mask(mask)
             data, mask = data.to(start_gpu), mask.to(end_gpu)
             output = model(data)
             loss = F.binary_cross_entropy_with_logits(output, mask, reduction='sum').item()
@@ -103,8 +103,6 @@ def main():
 
     start_gpu = f'cuda:{args.start_gpu}'
     end_gpu = f'cuda:{args.end_gpu}'
-    print(f'Start GPU: {start_gpu}')
-    print(f'End GPU: {end_gpu}')
 
     model = MicroUNet3D(n_channels=1, n_classes=1)
     optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
