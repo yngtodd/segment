@@ -104,7 +104,7 @@ def main():
     device = torch.device("cuda" if use_cuda else "cpu")
     print(f'device: {device}')
 
-    if device == 'cuda':
+    if device == "cuda":
         start_gpu = f'cuda:{args.start_gpu}'
         end_gpu = f'cuda:{args.end_gpu}'
         print(f'Start GPU: {start_gpu}')
