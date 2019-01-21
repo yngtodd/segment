@@ -55,8 +55,6 @@ def train(args, model, start_gpu, end_gpu, train_loader, optimizer, epoch, meter
                 logger.histo_summary(tag+'/grad', value.grad.data.cpu().numpy(), epoch)
 
             imgs = output.squeeze(0)
-            #imgs = torch.unbind(imgs, 0)
-            print(f'Output shape: {imgs.shape}')
             imgs = output.view(-1, 256, 256)[:2].detach().cpu().numpy()
             info = { 'segmentations': imgs }
 
