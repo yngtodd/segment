@@ -71,7 +71,7 @@ def dice_coefficient(input, target):
 
 def dice_score(prediction, groundtruth):
     prediction = torch.sigmoid(prediction)
-    pred = pred.cpu().numpy()
+    pred = prediction.cpu().numpy()
     pred = threshold_predictions(pred)
     groundtruth = groundtruth.cpu().numpy()
     pflat = pred.flatten()
