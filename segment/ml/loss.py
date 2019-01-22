@@ -36,18 +36,45 @@ class BCEDiceLoss(nn.Module):
         return bce_loss + (1 - dice_coef)
 
 
+class MulticlassDiceLoss(nn.Module):
+	"""
+	requires one hot encoded target. Applies DiceLoss on each class iteratively.
+	requires input.shape[0:1] and target.shape[0:1] to be (N, C) where N is
+	  batch size and C is number of classes
+	"""
+	def __init__(self):
+		super(MulticlassDiceLoss, self).__init__()
+ 
+	def forward(self, input, target, weights=None):
+ 
+		C = target.shape[1]
+ 
+		dice = SoftDiceLoss()
+		totalLoss = 0
+ 
+		for i in range(C):
+			diceLoss = dice(input[:,i], target[:,i])
+			if weights is not None:
+				diceLoss *= weights[i]
+			totalLoss += diceLoss
+ 
+		return totalLoss
+
+
 class SoftDiceLoss(nn.Module):
-    def __init__(self, weight=None, size_average=True):
-        super(SoftDiceLoss, self).__init__()
-
-    def forward(self, logits, targets):
-        smooth = 1
-        num = targets.size(0)
-        probs = _F.sigmoid(logits)
-        m1 = probs.view(num, -1)
-        m2 = targets.view(num, -1)
-        intersection = (m1 * m2)
-
-        score = 2. * (intersection.sum(1) + smooth) / (m1.sum(1) + m2.sum(1) + smooth)
-        score = 1 - score.sum() / num
-        return score
+	def __init__(self):
+		super(SoftDiceLoss, self).__init__()
+ 
+	def	forward(self, input, target):
+		N = target.size(0)
+		smooth = 1
+ 
+		input_flat = input.view(N, -1)
+		target_flat = target.view(N, -1)
+ 
+		intersection = input_flat * target_flat
+ 
+		loss = 2 * (intersection.sum(1) + smooth) / (input_flat.sum(1) + target_flat.sum(1) + smooth)
+		loss = 1 - loss.sum() / N
+ 
+		return loss
