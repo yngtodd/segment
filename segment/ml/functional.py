@@ -1,6 +1,7 @@
 import math
 import torch
 import torch.nn.functional as F
+from scipy import spatial
 
 
 def binary_dice_loss(input, target, smooth=1, weight=None):
@@ -64,6 +65,16 @@ def dice_coefficient(input, target):
     dice = 2. * (intersection + smooth) /(pred.sum(1) + truth.sum(1) + smooth)
 
     return dice.mean().item()
+
+
+def dice_score(prediction, groundtruth):
+    prediction = torch.sigmoid(prediction)
+    pflat = prediction.flatten()
+    gflat = groundtruth.flatten()
+    d = (1 - spatial.distance.dice(pflat, gflat)) * 100.0
+    if np.isnan(d):
+        return 0.0
+    return d
 
 
 def continuous_dice_coefficient(output, target):
