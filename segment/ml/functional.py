@@ -176,6 +176,7 @@ def dice_loss(logits, true, eps=1e-7):
     """
     num_classes = logits.shape[1]
     if num_classes == 1:
+        print(f'true is of type: {type(true)}')
         true_1_hot = torch.eye(num_classes + 1)[true.squeeze(1)]
         true_1_hot = true_1_hot.permute(0, 3, 1, 2).float()
         true_1_hot_f = true_1_hot[:, 0:1, :, :]
