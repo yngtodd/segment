@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import torch.nn.functional as _F
 from torch.nn.modules.loss import _Loss
 
 from . import functional as F
@@ -33,3 +34,20 @@ class BCEDiceLoss(nn.Module):
         dice_coef = (2. * (pred * truth).double().sum() + 1) / (pred.double().sum() + truth.double().sum() + 1)
 
         return bce_loss + (1 - dice_coef)
+
+
+class SoftDiceLoss(nn.Module):
+    def __init__(self, weight=None, size_average=True):
+        super(SoftDiceLoss, self).__init__()
+
+    def forward(self, logits, targets):
+        smooth = 1
+        num = targets.size(0)
+        probs = _F.sigmoid(logits)
+        m1 = probs.view(num, -1)
+        m2 = targets.view(num, -1)
+        intersection = (m1 * m2)
+
+        score = 2. * (intersection.sum(1) + smooth) / (m1.sum(1) + m2.sum(1) + smooth)
+        score = 1 - score.sum() / num
+        return score
