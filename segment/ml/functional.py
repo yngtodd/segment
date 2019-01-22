@@ -154,7 +154,7 @@ def iou_pytorch(output: torch.Tensor, target: torch.Tensor):
     return thresholded
 
 
-def dice_loss(true, logits, eps=1e-7):
+def dice_loss(logits, true, eps=1e-7):
     """Computes the Sørensen–Dice loss.
 
     Note that PyTorch optimizers minimize a loss. In this
