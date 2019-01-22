@@ -87,7 +87,7 @@ class ModelParallelUNet3D(nn.Module):
         x1 = self.inconv(x)
         x2, indices1 = self.down1(x1)
         # Transfer x -> GPU:1. & idx -> GPU:4
-        x3 = x2.to('cuda:1')
+        x2 = x2.to('cuda:1')
         indices1 = indices1.to('cuda:3')
         # GPU 1
         x3, indices2 = self.down2(x2)
