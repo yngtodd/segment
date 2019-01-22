@@ -102,6 +102,6 @@ class ModelParallelUNet3D(nn.Module):
         # Transfer x -> GPU:3.
         x6 = x6.to('cuda:3')
         # GPU 3
-        x7 = self.up2(x6, indices1, x1.shape)
+        x7 = self.up3(x6, indices1, x1.shape)
         x8 = self.outconv(x7)
         return x8
