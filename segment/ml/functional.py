@@ -1,5 +1,6 @@
 import math
 import torch
+import torch.nn.functional as F
 
 
 def binary_dice_loss(input, target, smooth=1, weight=None):
@@ -53,12 +54,14 @@ def dice_coefficient(input, target):
     batch_size = input.size(0)
     smooth = 1.
 
+    input = F.sigmoid(input)
+
     pred = input.view(batch_size, -1)
     truth = target.view(batch_size, -1)
 
     intersection = (pred * truth).sum(1)
 
-    dice = (2. * intersection + smooth) /(pred.sum(1) + truth.sum(1) + smooth)
+    dice = 2. * (intersection + smooth) /(pred.sum(1) + truth.sum(1) + smooth)
 
     return dice.mean().item()
 
@@ -79,16 +82,16 @@ def continuous_dice_coefficient(output, target):
 
     pred_size = pred.sum(1)
     truth_size = truth.sum(1)
-    
+
     intersection = (pred * truth).sum(1)
-    
+
     if intersection > 0:
         c =  (intersection / (truth * (1-math.exp(1e3*pred))).sum()).sum()
     else:
         c = 1
 
     continuous_dice = (2 * intersection) / (c * truth_size + pred_size)
-    
+
     return continuous_dice
 
 
