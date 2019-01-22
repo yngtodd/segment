@@ -71,6 +71,7 @@ def dice_score(prediction, groundtruth):
     prediction = torch.sigmoid(prediction)
     arg_max = torch.argmax(prediction, dim=1)
     pred = arg_max == max(arg_max)
+    pred = pred.cpu().numpy()
     pflat = pred.flatten()
     gflat = groundtruth.flatten()
     d = (1 - spatial.distance.dice(pflat, gflat)) * 100.0
