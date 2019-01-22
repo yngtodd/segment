@@ -175,6 +175,7 @@ def dice_loss(logits, true, eps=1e-7):
         dice_loss: the Sørensen–Dice loss.
     """
     num_classes = logits.shape[1]
+    true = true.long()
     if num_classes == 1:
         print(f'true is of type: {type(true)}')
         true_1_hot = torch.eye(num_classes + 1)[true.squeeze(1)]
