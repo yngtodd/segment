@@ -69,9 +69,9 @@ def dice_coefficient(input, target):
 
 def dice_score(prediction, groundtruth):
     prediction = torch.sigmoid(prediction)
-    prediction = prediction.data.cpu().numpy()
-    prediction = threshold_predictions(prediction)
-    pflat = prediction.flatten()
+    arg_max = torch.argmax(prediction, dim=1)
+    pred = argmax == max(argmax)
+    pflat = pred.flatten()
     gflat = groundtruth.flatten()
     d = (1 - spatial.distance.dice(pflat, gflat)) * 100.0
     if np.isnan(d):
