@@ -85,6 +85,6 @@ class MicroUnet3D(nn.Module):
         x2, indices1 = self.down1(x1)
         x3, indices2 = self.down2(x2)
         x4 = self.up1(x3, indices2, x2.shape)
-        x5 = self.up2(x4, indices1, x1.shape)
-        x6 = self.outconv(x5)
+        x5 = self.up2(torch.cat([x4, x2], dim=1), indices1, x1.shape)
+        x6 = self.outconv(torch.cat([x5, x1], dim=1))
         return x6
