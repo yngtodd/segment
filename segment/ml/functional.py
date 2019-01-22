@@ -69,7 +69,8 @@ def dice_coefficient(input, target):
 
 def dice_score(prediction, groundtruth):
     prediction = torch.sigmoid(prediction)
-    prediction = prediction.cpu().numpy()
+    prediction = prediction.detach().cpu().numpy()
+    prediction = threshold_predictions(prediction)
     pflat = prediction.flatten()
     gflat = groundtruth.flatten()
     d = (1 - spatial.distance.dice(pflat, gflat)) * 100.0
@@ -147,3 +148,13 @@ def iou_pytorch(output: torch.Tensor, target: torch.Tensor):
     thresholded = torch.clamp(20 * (iou - 0.5), 0, 10).ceil() / 10
 
     return thresholded
+
+
+def threshold_predictions(predictions, thr=0.999):
+    """Threshold predictions for dice"""
+    thresholded_preds = predictions[:]
+    low_values_indices = thresholded_preds < thr
+    thresholded_preds[low_values_indices] = 0
+    low_values_indices = thresholded_preds >= thr
+    thresholded_preds[low_values_indices] = 1
+    return thresholded_preds
