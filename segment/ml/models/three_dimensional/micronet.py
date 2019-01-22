@@ -84,6 +84,7 @@ class MicroUnet3D(nn.Module):
         x1 = self.inconv(x)
         x2, indices1 = self.down1(x1)
         x3, indices2 = self.down2(x2)
+        print(f'x1:shape: {x.shape} | x2: {x2.shape} | x3 {x3.shape}')
         x4 = self.up1(x3, indices2, x2.shape)
         x5 = self.up2(torch.cat([x4, x2], dim=1), indices1, x1.shape)
         x6 = self.outconv(torch.cat([x5, x1], dim=1))
