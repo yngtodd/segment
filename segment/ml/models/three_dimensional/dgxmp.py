@@ -10,10 +10,10 @@ class DoubleBlock(nn.Module):
         super(DoubleBlock, self).__init__()
 
         self.conv = nn.Sequential(
-            nn.Conv3d(in_ch, out_ch, 3, padding=1),
+            nn.Conv3d(in_ch, out_ch, 3),
             nn.BatchNorm3d(out_ch),
             nn.ReLU(inplace=True),
-            nn.Conv3d(out_ch, out_ch, 3, padding=1),
+            nn.Conv3d(out_ch, out_ch, 3),
             nn.BatchNorm3d(out_ch),
             nn.ReLU(inplace=True)
         )
@@ -36,7 +36,7 @@ class Down(nn.Module):
 
     def __init__(self, in_ch, out_ch):
         super(Down, self).__init__()
-        self.pool = nn.MaxPool3d(2, return_indices=True)
+        self.pool = nn.MaxPool3d(2, stride=2, return_indices=True)
         self.block = DoubleBlock(in_ch, out_ch)
 
     def forward(self, x):
