@@ -10,10 +10,10 @@ class DoubleBlock(nn.Module):
         super(DoubleBlock, self).__init__()
 
         self.conv = nn.Sequential(
-            nn.Conv3d(in_ch, out_ch, 3),
+            nn.Conv3d(in_ch, out_ch, 3, padding=1),
             nn.BatchNorm3d(out_ch),
             nn.ReLU(inplace=True),
-            nn.Conv3d(out_ch, out_ch, 3),
+            nn.Conv3d(out_ch, out_ch, 3, padding=1),
             nn.BatchNorm3d(out_ch),
             nn.ReLU(inplace=True)
         )
