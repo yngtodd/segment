@@ -7,19 +7,25 @@ from torch.utils.data import DataLoader
 from segment.data import IRCAD3D
 from segment.data.utils import train_valid_split
 
-from segment.ml.models.three_dimensional.multi_micronet import MicroUNet3D
+from segment.ml.models.three_dimensional.dgxmp import ModelParallelUNet3D
 from segment.ml import AverageMeter
 from segment.ml.logging import Logger
 from segment.ml.functional import dice_coefficient
+from segment.ml.functional import dice_score
+from segment.ml.functional import dice_loss
+from segment.ml.loss import SoftDiceLoss
 
 from parser import parse_args
 
 
 downsample_img = nn.AvgPool3d(2)
 downsample_mask = nn.MaxPool3d(2)
+softmax = nn.Softmax(dim=1)
+
+torch.backends.cudnn.enabled = False
 
 
-def train(args, model, start_gpu, end_gpu, train_loader, optimizer, epoch, meters):
+def train(args, model, start_gpu, end_gpu, train_loader, optimizer, epoch, meters, criterion):
     trainloss = meters['loss']
     traindice = meters['dice']
 
@@ -32,8 +38,14 @@ def train(args, model, start_gpu, end_gpu, train_loader, optimizer, epoch, meter
         data, mask = data.to(start_gpu), mask.to(end_gpu)
         optimizer.zero_grad()
         output = model(data)
-        loss = F.binary_cross_entropy_with_logits(output, mask)
-        dice = dice_coefficient(output, mask)
+        #loss = F.binary_cross_entropy_with_logits(output, mask, reduction='mean')
+        output = torch.sigmoid(output)
+        output, out = torch.max(output, dim=1)
+        out = out.float()
+        loss = criterion(output, mask)
+        dice = dice_coefficient(out, mask.squeeze(1))
+        #dice = dice_score(output, mask)
+        #loss, dice = dice_loss(output, mask)
         loss.backward()
         optimizer.step()
         trainloss.update(loss.item())
@@ -61,7 +73,7 @@ def train(args, model, start_gpu, end_gpu, train_loader, optimizer, epoch, meter
                 logger.image_summary(tag, images, epoch)
 
 
-def test(args, model, start_gpu, end_gpu, test_loader, meters, epoch):
+def test(args, model, start_gpu, end_gpu, test_loader, meters, epoch, criterion):
     testloss = meters['loss']
     testdice = meters['dice']
 
@@ -75,11 +87,14 @@ def test(args, model, start_gpu, end_gpu, test_loader, meters, epoch):
             mask = downsample_mask(mask)
             data, mask = data.to(start_gpu), mask.to(end_gpu)
             output = model(data)
-            loss = F.binary_cross_entropy_with_logits(output, mask, reduction='sum').item()
+            #loss = F.binary_cross_entropy_with_logits(output, mask, reduction='sum').item()
+            loss = criterion(output, mask)
+            #loss, dice = dice_loss(output, mask)
             test_loss += loss
             dice = dice_coefficient(output, mask)
+            #dice = dice_score(output, mask)
             testdice.update(dice)
-            testloss.update(loss)
+            testloss.update(loss.cpu())
 
             info = { 'test_loss': loss, 'test_dice': testdice.avg }
 
@@ -103,8 +118,9 @@ def main():
     start_gpu = f'cuda:{args.start_gpu}'
     end_gpu = f'cuda:{args.end_gpu}'
 
-    model = MicroUNet3D(n_channels=1, n_classes=1)
+    model = ModelParallelUNet3D(n_channels=1, n_classes=2)
     optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
+    criterion = SoftDiceLoss()
 
     dataset = IRCAD3D(args.datapath, tissue='bone')
     print(f'Segmenting {dataset.tissue}')
@@ -124,8 +140,8 @@ def main():
     }
 
     for epoch in range(1, args.epochs + 1):
-        train(args, model, start_gpu, end_gpu, trainloader, optimizer, epoch, train_meters)
-        test(args, model, start_gpu, end_gpu, testloader, test_meters, epoch)
+        train(args, model, start_gpu, end_gpu, trainloader, optimizer, epoch, train_meters, criterion)
+        test(args, model, start_gpu, end_gpu, testloader, test_meters, epoch, criterion)
 
     train_meters['loss'].save()
     train_meters['dice'].save()

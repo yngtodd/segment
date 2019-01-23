@@ -7,7 +7,7 @@ from torch.utils.data import DataLoader
 from segment.data import IRCAD3D
 from segment.data.utils import train_valid_split
 
-from segment.ml.models.three_dimensional.mp_unet import UNet3D
+from segment.ml.models.three_dimensional.micronet import MicroUnet3D
 from segment.ml import AverageMeter
 from segment.ml.logging import Logger
 from segment.ml.functional import dice_coefficient
@@ -103,7 +103,7 @@ def main():
     use_cuda = not args.no_cuda and torch.cuda.is_available()
     device = torch.device("cuda" if use_cuda else "cpu")
 
-    model = UNet3D(n_channels=1, n_classes=1)
+    model = MicroUnet3D(n_channels=1, n_classes=1).to(device)
     optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
 
     dataset = IRCAD3D(args.datapath, tissue='bone')

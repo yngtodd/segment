@@ -57,7 +57,7 @@ def dice_coefficient(input, target):
     batch_size = input.size(0)
     smooth = 1.
 
-    input = F.sigmoid(input)
+#    input = F.sigmoid(input)
 
     pred = input.view(batch_size, -1)
     truth = target.view(batch_size, -1)
