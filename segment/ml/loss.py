@@ -67,7 +67,6 @@ class SoftDiceLoss(nn.Module):
 
     def forward(self, input, target):
         N = target.size(0)
-
         input_flat = input.view(N, -1)
         target_flat = target.view(N, -1)
 
