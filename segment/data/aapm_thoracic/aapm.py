@@ -27,7 +27,7 @@ class Patient:
         self.mask = f'label_{patient_number}.pth'
 
     def __repr__(self):
-        img = self.load(img)
+        img = self.load_img(img)
         return f'AAPM Thoracic Patient: {self.img} '\
                f'\tImage Size: {img.shape}'
 
