@@ -11,8 +11,6 @@ from segment.ml.models.three_dimensional.dgxmp import ModelParallelUNet3D
 from segment.ml import AverageMeter
 from segment.ml.logging import Logger
 from segment.ml.functional import dice_coefficient
-from segment.ml.functional import dice_score
-from segment.ml.functional import dice_loss
 from segment.ml.loss import SoftDiceLoss
 
 from parser import parse_args
