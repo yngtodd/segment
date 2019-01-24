@@ -29,7 +29,7 @@ class Patient:
     def __repr__(self):
         img = self.load_img()
         return f'AAPM Thoracic Patient: {self.img} '\
-               f'\tImage Size: {img.shape}'
+               f'\n Image Size: {img.shape}'
 
     def load_img(self):
         img_path = os.path.join(self.path, self.img)
