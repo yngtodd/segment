@@ -71,7 +71,7 @@ class SoftDiceLoss(nn.Module):
         target_flat = target.view(N, -1)
 
         intersection = input_flat * target_flat
-        denom_sum = input_flat.sum(1) + target_flat.sum(1)
+        denom_sum = mse_loss(input_flat, axis=1) + mse_loss(target_flat, axis=1)
 
         if denom_sum == 0:
             loss = 0
