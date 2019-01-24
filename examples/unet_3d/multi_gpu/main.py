@@ -40,16 +40,16 @@ def train(args, model, start_gpu, end_gpu, train_loader, optimizer, epoch, meter
         output = model(data)
         #loss = F.binary_cross_entropy_with_logits(output, mask, reduction='mean')
         output = torch.sigmoid(output)
-        output, out = torch.max(output, dim=1)
-        out = out.float()
         loss = criterion(output, mask)
-        dice = dice_coefficient(out, mask.squeeze(1))
+        with torch.no_grad():
+            output_binary = output > 0.5
+            dice = dice_coefficient(output_binary, mask)
         #dice = dice_score(output, mask)
         #loss, dice = dice_loss(output, mask)
         loss.backward()
         optimizer.step()
         trainloss.update(loss.item())
-        traindice.update(dice)
+        traindice.update(dice.item())
 
         if batch_idx % args.log_interval == 0:
             print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}, Dice: {:.6f}'.format(
@@ -89,7 +89,6 @@ def test(args, model, start_gpu, end_gpu, test_loader, meters, epoch, criterion)
             output = model(data)
             #loss = F.binary_cross_entropy_with_logits(output, mask, reduction='sum').item()
             loss = criterion(output, mask)
-            #loss, dice = dice_loss(output, mask)
             test_loss += loss
             dice = dice_coefficient(output, mask)
             #dice = dice_score(output, mask)
@@ -118,7 +117,7 @@ def main():
     start_gpu = f'cuda:{args.start_gpu}'
     end_gpu = f'cuda:{args.end_gpu}'
 
-    model = ModelParallelUNet3D(n_channels=1, n_classes=2)
+    model = ModelParallelUNet3D(n_channels=1, n_classes=1)
     optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
     criterion = SoftDiceLoss()
 
