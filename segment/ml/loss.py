@@ -44,41 +44,40 @@ class MulticlassDiceLoss(nn.Module):
 	"""
 	def __init__(self):
 		super(MulticlassDiceLoss, self).__init__()
- 
+
 	def forward(self, input, target, weights=None):
- 
+
 		C = target.shape[1]
- 
+
 		dice = SoftDiceLoss()
 		totalLoss = 0
- 
+
 		for i in range(C):
 			diceLoss = dice(input[:,i], target[:,i])
 			if weights is not None:
 				diceLoss *= weights[i]
 			totalLoss += diceLoss
- 
+
 		return totalLoss
 
 
 class SoftDiceLoss(nn.Module):
-	def __init__(self):
-		super(SoftDiceLoss, self).__init__()
- 
-	def	forward(self, input, target):
-		N = target.size(0)
-		smooth = 1
- 
-		input_flat = input.view(N, -1)
-		target_flat = target.view(N, -1)
- 
-		intersection = input_flat * target_flat
+    def __init__(self):
+        super(SoftDiceLoss, self).__init__()
+
+    def forward(self, input, target):
+        N = target.size(0)
+
+        input_flat = input.view(N, -1)
+        target_flat = target.view(N, -1)
+
+        intersection = input_flat * target_flat
         denom_sum = input_flat.sum(1) + target_flat.sum(1)
-        
+
         if denom_sum == 0:
             loss = 0
         else:
             loss = 2 * (intersection.sum(1) + smooth) / denom_sum
             loss = 1 - loss.sum() / N
-        
+
         return loss
