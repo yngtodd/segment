@@ -62,11 +62,14 @@ def dice_coefficient(input, target):
     pred = input.view(batch_size, -1)
     truth = target.view(batch_size, -1)
 
-    intersection = (pred * truth).sum(1)
+    denom_sum = pred.sum(1) + truth.sum(1)
 
-    dice = 2. * (intersection + smooth) /(pred.sum(1) + truth.sum(1) + smooth)
-
-    return dice.mean().item()
+    if denom_sum == 0:
+        return 0
+    else :
+        intersection = (pred * truth).sum(1)
+        dice = 2. * (intersection + smooth) / denom_sum
+        return dice.mean().item()
 
 
 def dice_score(prediction, groundtruth):
