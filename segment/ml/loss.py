@@ -79,6 +79,6 @@ class SoftDiceLoss(nn.Module):
             loss = 0
         else:
             loss = 2 * (intersection.sum(1) + smooth) / denom_sum
-		    loss = 1 - loss.sum() / N
- 
-		return loss
+            loss = 1 - loss.sum() / N
+        
+        return loss
