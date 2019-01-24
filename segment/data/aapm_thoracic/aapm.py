@@ -38,3 +38,36 @@ class Patient:
     def load_mask(self):
         mask_path = os.path.join(self.path, self.mask)
         return torch.load(mask_path)
+
+
+class AAPM(Dataset):
+    """
+    AAPM Thoracic Dataset.
+
+    Parameters
+    ----------
+    path : str
+        Path to AAPM data.
+
+    References
+    ----------
+    """
+    def __init__(self, path, tissue=None, transform=None):
+        self.path = path
+        self.transform = transform
+
+    def __repr__(self):
+        return f'AAPM Thoracic Dataset.'
+
+    def __len__(self):
+        return 50
+
+    def __getitem__(self, idx):
+        patient = Patient(self.path, idx)
+        img = patient.load_img()
+        mask = patient.load_mask()
+
+        if self.transform is not None:
+            img = self.transform(img)
+
+        return img, mask
