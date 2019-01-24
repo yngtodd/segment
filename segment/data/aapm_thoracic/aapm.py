@@ -23,12 +23,13 @@ class Patient:
     """
     def __init__(self, path, patient_number):
         self.path = path
+        self.patient_number = patient_number
         self.img = f'image_{patient_number}.pth'
         self.mask = f'label_{patient_number}.pth'
 
     def __repr__(self):
         img = self.load_img()
-        return f'AAPM Thoracic Patient: {self.img} '\
+        return f'AAPM Thoracic Patient: {self.patient_number} '\
                f'\n Image Size: {img.shape}'
 
     def load_img(self):
@@ -37,8 +38,11 @@ class Patient:
 
     def load_mask(self):
         mask_path = os.path.join(self.path, self.mask)
-        return torch.load(mask_path)
-
+        try:
+            return torch.load(mask_path)
+        except:
+            raise FileNotFoundError(f'Patient {self.patient_number} '\
+                                    f'has no label mask.')
 
 class AAPM(Dataset):
     """
