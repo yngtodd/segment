@@ -71,12 +71,12 @@ class SoftDiceLoss(nn.Module):
         target_flat = target.view(N, -1)
 
         intersection = input_flat * target_flat
-        denom_sum = torch.dot(input_flat, input_flat) + torch.dot(target_flat, input_flat)
+        denom_sum = (input_flat**2).sum(1) + (target_flat**2).sum(1)
 
         if denom_sum == 0:
             loss = 0
         else:
             loss = 2 * intersection.sum(1) / denom_sum
-            loss = 1 - loss.mean() / N
+            loss = 1 - loss.sum() / N
 
         return loss
