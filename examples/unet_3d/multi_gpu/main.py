@@ -22,8 +22,6 @@ downsample_img = nn.AvgPool3d(2)
 downsample_mask = nn.MaxPool3d(2)
 softmax = nn.Softmax(dim=1)
 
-torch.backends.cudnn.enabled = False
-
 
 def train(args, model, start_gpu, end_gpu, train_loader, optimizer, epoch, meters, criterion):
     trainloss = meters['loss']
@@ -43,13 +41,11 @@ def train(args, model, start_gpu, end_gpu, train_loader, optimizer, epoch, meter
         loss = criterion(output, mask)
         with torch.no_grad():
             output_binary = output > 0.5
-            dice = dice_coefficient(output_binary, mask)
-        #dice = dice_score(output, mask)
-        #loss, dice = dice_loss(output, mask)
+            dice = dice_coefficient(output_binary.float(), mask)
         loss.backward()
         optimizer.step()
         trainloss.update(loss.item())
-        traindice.update(dice.item())
+        traindice.update(dice)
 
         if batch_idx % args.log_interval == 0:
             print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}, Dice: {:.6f}'.format(
@@ -90,8 +86,9 @@ def test(args, model, start_gpu, end_gpu, test_loader, meters, epoch, criterion)
             #loss = F.binary_cross_entropy_with_logits(output, mask, reduction='sum').item()
             loss = criterion(output, mask)
             test_loss += loss
-            dice = dice_coefficient(output, mask)
-            #dice = dice_score(output, mask)
+            with torch.no_grad():
+                output_binary = output > 0.5
+                dice = dice_coefficient(output_binary.float(), mask)
             testdice.update(dice)
             testloss.update(loss.cpu())
 
