@@ -66,6 +66,7 @@ class SoftDiceLoss(nn.Module):
         super(SoftDiceLoss, self).__init__()
 
     def forward(self, input, target):
+        smooth = 1 
         N = target.size(0)
         input_flat = input.view(N, -1)
         target_flat = target.view(N, -1)
@@ -73,10 +74,7 @@ class SoftDiceLoss(nn.Module):
         intersection = input_flat * target_flat
         denom_sum = input_flat.sum(1) + target_flat.sum(1)
 
-        if denom_sum == 0:
-            loss = 0
-        else:
-            loss = 2 * intersection.sum(1) / denom_sum
-            loss = 1 - loss.sum() / N
+        loss = 2 * (intersection.sum(1) + smooth) / (denom_sum + smooth)
+        loss = 1 - loss.sum() / N
 
         return loss
