@@ -270,7 +270,7 @@ class IRCAD2D(Dataset):
             warnings.warn(f'There are only {len(self.masks)} masks for {self.tissue}')
 
     def __repr__(self):
-        return f'IRCAD 2D liver segmentation'
+        return f'IRCAD 2D segmentation'
 
     def __len__(self):
         return len(self.slices)
