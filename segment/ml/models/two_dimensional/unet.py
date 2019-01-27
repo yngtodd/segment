@@ -76,7 +76,7 @@ class UNet2D(nn.Module):
         self.down1 = Down(64, 128)
         self.down2 = Down(128, 256)
         self.down3 = Down(256, 512)
-        self.down4 = Down(512, 512)
+        self.down4 = Down(512, 1024)
         self.up1 = Up(1024, 512)
         self.up2 = Up(512, 256)
         self.up3 = Up(256, 128)
