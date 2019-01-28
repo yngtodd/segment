@@ -9,22 +9,24 @@ from segment.data.utils import train_valid_split
 from segment.ml import UNet2D
 from segment.ml import AverageMeter
 from segment.ml.logging import Logger
+from segment.ml.loss import SoftDiceLoss
 from segment.ml.functional import dice_coefficient
 from parser import parse_args
 
 
-def train(args, model, device, train_loader, optimizer, epoch, meters):
+def train(args, model, device, train_loader, optimizer, epoch, meters, criterion):
     trainloss = meters['loss']
     traindice = meters['dice']
 
     model.train()
     for batch_idx, (data, mask) in enumerate(train_loader):
-        data = data.float()
-        mask = mask.float()
+        data = data.unsqueeze(1).float()
+        mask = mask.unsqueeze(1).float()
         data, mask = data.to(device), mask.to(device)
         optimizer.zero_grad()
         output = model(data)
-        loss = F.binary_cross_entropy_with_logits(output, mask)
+        loss = criterion(output, mask)
+        #loss = F.binary_cross_entropy_with_logits(output, mask)
         dice = dice_coefficient(output, mask)
         loss.backward()
         optimizer.step()
@@ -54,7 +56,7 @@ def train(args, model, device, train_loader, optimizer, epoch, meters):
                 logger.image_summary(tag, images, epoch)
 
 
-def test(args, model, device, test_loader, meters, epoch):
+def test(args, model, device, test_loader, meters, epoch, criterion):
     testloss = meters['loss']
     testdice = meters['dice']
 
@@ -62,11 +64,12 @@ def test(args, model, device, test_loader, meters, epoch):
     test_loss = 0
     with torch.no_grad():
         for batch_idx, (data, mask) in enumerate(test_loader):
-            data = data.float()
-            mask = mask.float()
+            data = data.unsqueeze(1).float()
+            mask = mask.unsqueeze(1).float()
             data, mask = data.to(device), mask.to(device)
             output = model(data)
-            loss = F.binary_cross_entropy_with_logits(output, mask, reduction='sum').item()
+            loss = criterion(output, mask)
+            #loss = F.binary_cross_entropy_with_logits(output, mask, reduction='sum').item()
             test_loss += loss
             dice = dice_coefficient(output, mask)
             testdice.update(dice)
@@ -84,6 +87,7 @@ def test(args, model, device, test_loader, meters, epoch):
 
 
 def main():
+    print(f'Kicking off.')
     args = parse_args()
 
     global logger
@@ -95,6 +99,8 @@ def main():
 
     model = UNet2D(n_channels=1, n_classes=1).to(device)
     optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
+    criterion = SoftDiceLoss()
+    print('loading data...')
 
     dataset = IRCAD2D(args.datapath, tissue='bone', binarymask=True)
     print(f'Segmenting {dataset.tissue}')
@@ -114,8 +120,8 @@ def main():
     }
 
     for epoch in range(1, args.epochs + 1):
-        train(args, model, device, trainloader, optimizer, epoch, train_meters)
-        test(args, model, device, testloader, test_meters, epoch)
+        train(args, model, device, trainloader, optimizer, epoch, train_meters, criterion)
+        test(args, model, device, testloader, test_meters, epoch, criterion)
 
     train_meters['loss'].save()
     train_meters['dice'].save()
