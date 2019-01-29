@@ -69,6 +69,7 @@ class AAPM(Dataset):
 
     def __getitem__(self, idx):
         patient = Patient(self.path, idx)
+        print(f'Patient number: {patient.patient_number}')
         img = patient.load_img()
         mask = patient.load_mask()
 

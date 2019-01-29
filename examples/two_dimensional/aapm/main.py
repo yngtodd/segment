@@ -3,7 +3,7 @@ import torch.optim as optim
 import torch.nn.functional as F
 from torch.utils.data import DataLoader
 
-from segment.data import IRCAD2D
+from segment.data import AAPM
 from segment.data.utils import train_valid_split
 
 from segment.ml import UNet2D
@@ -102,9 +102,7 @@ def main():
     criterion = SoftDiceLoss()
     print('loading data...')
 
-    dataset = IRCAD2D(args.datapath, tissue='bone', binarymask=True)
-    print(f'Segmenting {dataset.tissue}')
-
+    dataset = AAPM(args.datapath)
     trainset, testset = train_valid_split(dataset)
     trainloader = DataLoader(trainset, batch_size=args.batch_size)
     testloader = DataLoader(testset, batch_size=args.batch_size)

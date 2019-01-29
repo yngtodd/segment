@@ -11,13 +11,13 @@ def parse_args():
         Parsed arguments.
     """
     parser = argparse.ArgumentParser(description='Segmentation parameters.')
-    parser.add_argument('-d','--datapath', metavar='DIR', default='/raid/scratch/hinklejd/3D-IRCADb1',
+    parser.add_argument('-d','--datapath', metavar='DIR', default='/home/ygx/data/aapm17/labeled',
                         help='path to dataset')
     parser.add_argument('-mtr','--meterpath', default='/home/ygx/experiments/segment',
                         help='path to save meter information')
-    parser.add_argument('-log','--logpath', default='/home/ygx/experiments/segment/two_dimensional',
+    parser.add_argument('-log','--logpath', default='/home/ygx/experiments/segment/two_dimensional/aapm',
                         help='path to save meter information')
-    parser.add_argument('--batch_size', type=int, default=8, metavar='N',
+    parser.add_argument('--batch_size', type=int, default=1, metavar='N',
                         help='input batch size for training (default: 16)')
     parser.add_argument('--epochs', type=int, default=100, metavar='N',
                         help='number of epochs to train (default: 100)')
