@@ -66,8 +66,8 @@ class AAPM(Dataset):
             'heart': 1,
             'esophagus': 2,
             'bone': 3,
-            'liver': 4,
-            'lungs': 5
+            'rightlung': 4,
+            'leftlung': 5
         }
 
     def __repr__(self):
