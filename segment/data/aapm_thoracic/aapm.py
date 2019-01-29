@@ -81,6 +81,7 @@ class AAPM(Dataset):
         img = patient.load_img()
         mask = patient.load_mask()
         if self.tissue:
+            print(f'tissue map: {self.tissue_map[self.tissue]}')
             mask = mask == self.tissue_map[self.tissue]
 
         if self.transform is not None:
