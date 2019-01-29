@@ -44,6 +44,7 @@ class Patient:
             raise FileNotFoundError(f'Patient {self.patient_number} '\
                                     f'has no label mask.')
 
+
 class AAPM(Dataset):
     """
     AAPM Thoracic Dataset.
