@@ -60,6 +60,15 @@ class AAPM(Dataset):
     def __init__(self, path, tissue=None, transform=None):
         self.path = path
         self.transform = transform
+        self.tissue = tissue
+        self.tissue_map = {
+            'background': 0,
+            'heart': 1,
+            'esophagus': 2,
+            'bone': 3,
+            'liver': 4,
+            'lungs': 5
+        }
 
     def __repr__(self):
         return f'AAPM Thoracic Dataset.'
@@ -71,6 +80,8 @@ class AAPM(Dataset):
         patient = Patient(self.path, idx)
         img = patient.load_img()
         mask = patient.load_mask()
+        if self.tissue:
+            mask = mask == self.tissue_map[self.tissue]
 
         if self.transform is not None:
             img = self.transform(img)
