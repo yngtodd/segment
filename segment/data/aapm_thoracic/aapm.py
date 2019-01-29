@@ -65,7 +65,7 @@ class AAPM(Dataset):
         return f'AAPM Thoracic Dataset.'
 
     def __len__(self):
-        return 35
+        return 36
 
     def __getitem__(self, idx):
         patient = Patient(self.path, idx)
