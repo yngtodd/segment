@@ -11,10 +11,11 @@ from segment.ml import AverageMeter
 from segment.ml.logging import Logger
 from segment.ml.loss import SoftDiceLoss
 from segment.ml.functional import dice_coefficient
+from segment.ml.checkpoint import save_checkpoint, load_checkpoint
 from parser import parse_args
 
 
-def train(args, model, device, train_loader, optimizer, epoch, meters, criterion, savefile=None):
+def train(args, model, device, train_loader, optimizer, epoch, meters, criterion, savepath=None, savefile=None):
     trainloss = meters['loss']
     traindice = meters['dice']
 
@@ -56,12 +57,7 @@ def train(args, model, device, train_loader, optimizer, epoch, meters, criterion
                 logger.image_summary(tag, images, epoch)
 
             if args.checkpoint:
-                torch.save({
-                    'epoch': epoch,
-                    'model_state': model.state_dict(),
-                    'optimizer_state': optimizer.state_dict(),
-                    'loss': loss
-                }, savefile)
+                save_checkpoint(model, optimizer, epoch, loss, savepath, savefile)
 
 
 def test(args, model, device, test_loader, meters, epoch, criterion):
@@ -110,15 +106,9 @@ def main():
 
     dataset = IRCAD2D(args.datapath, tissue='bone', binarymask=True)
     print(f'Segmenting {dataset.tissue}')
-    
-    savefile = os.path.join(args.savepath, f'ircad2d{dataset.tissue}'
+
     if args.resume:
-        try:
-            checkpoint = torch.load(savefile)
-            model.load_state_dict(checkpoint['model_state'])
-            optimizer.load_state_dict(checkpoint['optimizer_state'])
-        except FileNotFoundError as fnf_error:
-            print(fnf_error)
+        model, optimizer = load_checkpoint(model, optimizer, args.savepath, args.savefile)
 
     trainset, testset = train_valid_split(dataset)
     trainloader = DataLoader(trainset, batch_size=args.batch_size)
@@ -135,7 +125,7 @@ def main():
     }
 
     for epoch in range(1, args.epochs + 1):
-        train(args, model, device, trainloader, optimizer, epoch, train_meters, criterion, savefile)
+        train(args, model, device, trainloader, optimizer, epoch, train_meters, criterion, savepath, savefile)
         test(args, model, device, testloader, test_meters, epoch, criterion)
 
     train_meters['loss'].save()
