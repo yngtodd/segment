@@ -1,3 +1,4 @@
+import time
 import argparse
 
 
@@ -10,6 +11,7 @@ def parse_args():
     * `args`: [argparse object]
         Parsed arguments.
     """
+    strtime = time.strftime("%Y-%m-%d")
     parser = argparse.ArgumentParser(description='Segmentation parameters.')
     parser.add_argument('-d','--datapath', metavar='DIR', default='/raid/scratch/hinklejd/3D-IRCADb1',
                         help='path to dataset')
@@ -17,8 +19,16 @@ def parse_args():
                         help='path to save meter information')
     parser.add_argument('-log','--logpath', default='/home/ygx/experiments/segment/two_dimensional',
                         help='path to save meter information')
+    parser.add_argument('--savepath', default='/home/ygx/segment/saves/two_dimensional/ircad',
+                        help='path to save model/optimizer states')
+    parser.add_argument('--savefile', default=f'ircad2d_{strtime}',
+                        help='filename to save model/optimizer states')
+    parser.add_argument('--checkpoint', action='store_true', default=False,
+                        help='Whether to checkpoint model')
+    parser.add_argument('--resume', action='store_true', default=False,
+                        help='Whether to resume from previously saved model')
     parser.add_argument('--batch_size', type=int, default=8, metavar='N',
-                        help='input batch size for training (default: 16)')
+                        help='input batch size for training (default: 8)')
     parser.add_argument('--epochs', type=int, default=100, metavar='N',
                         help='number of epochs to train (default: 100)')
     parser.add_argument('--lr', type=float, default=0.01, metavar='LR',
