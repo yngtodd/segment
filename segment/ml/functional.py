@@ -70,20 +70,6 @@ def dice_coefficient(input, target):
         return dice.mean().item()
 
 
-def dice_score(prediction, groundtruth):
-    prediction = torch.sigmoid(prediction)
-    pred = prediction.cpu()
-    pred = pred.detach().numpy()
-    pred = threshold_predictions(pred)
-    groundtruth = groundtruth.cpu().numpy()
-    pflat = pred.flatten()
-    gflat = groundtruth.flatten()
-    d = (1 - spatial.distance.dice(pflat, gflat)) * 100.0
-    if np.isnan(d):
-        return 0.0
-    return d
-
-
 def continuous_dice_coefficient(output, target):
     """
     Continuous version of the Dice coefficient.
