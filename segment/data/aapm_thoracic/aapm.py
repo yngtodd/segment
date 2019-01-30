@@ -16,7 +16,7 @@ class Patient:
 
     patient_number : int
         Integer value corresponding to patient ID.
-        - Must be between [0, 59]
+        - Must be in [0, 35] for labeled data
 
     References
     ----------
