@@ -14,7 +14,7 @@ class Patient:
     path : str
         Path to patient records.
 
-    patient_number : int 
+    patient_number : int
         Integer value corresponding to patient ID.
         - Must be between [0, 59]
 
@@ -64,7 +64,7 @@ class AAPM(Dataset):
         return f'AAPM Thoracic Dataset.'
 
     def __len__(self):
-        return 50
+        return 35
 
     def __getitem__(self, idx):
         patient = Patient(self.path, idx)
