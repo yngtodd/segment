@@ -2,19 +2,67 @@ import os
 import torch
 
 
-def save_checkpoint(path, state):
+def save_checkpoint(model, optimizer, epoch, loss, savepath, savefile):
     """
     Save Pytorch model and optimizer state.
 
     Parameters
     ----------
-    path : str
+    model : nn.Module
+        Model to be saved.
+
+    optimizer : pytorch optimizer
+        Optimizer to be saved.
+
+    epoch : int
+        Epoch save occurs.
+
+    loss : float
+        Current loss.
+
+    savepath : str
         Path to save state to.
 
-    state : dict
-        Dictionary of save state. Must include `epoch` number
-        and, ideally, both the model state dict and optimizer state dict.
+    savefile : str
+        Filename to save to.
     """
-    filename='checkpoint' + str(state['epoch']) + '.pth.tar'
-    savepath = os.path.join(path, filename)
-    torch.save(state, savepath)
+    state = {
+      'epoch': epoch,
+      'model_state': model.state_dict(),
+      'optimizer_state': optimizer.state_dict(),
+      'loss': loss
+    }
+    savefile = os.path.join(path, savefile)
+    torch.save(state, savefile)
+
+
+def load_checkpoint(model, optimizer, savepath, savefile):
+    """
+    Load previously saved model and optimizer.
+
+    Paramters
+    ---------
+    model : nn.Module
+        Model to be loaded.
+
+    optimizer : pytorch optimizer
+        Optimizer to be restored.
+
+    savepath :
+        Path to directory where checkpoint file lives.
+
+    savefile : str
+        Name of the file checkpoint file.
+
+    Returns
+    -------
+        Restored model and optimizer.
+    """
+    savefile = os.path.join(savepath, savefile)
+    try:
+        checkpoint = torch.load(savefile)
+        model.load_state_dict(checkpoint['model_state'])
+        optimizer.load_state_dict(checkpoint['optimizer_state'])
+        return model, optimizer
+    except FileNotFoundError as fnf_error:
+        print(fnf_error)
