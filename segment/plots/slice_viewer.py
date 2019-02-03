@@ -32,10 +32,10 @@ def next_slice(ax):
     ax.images[0].set_array(volume[ax.index])
 
 
- def multi_slice_viewer(volume):
-     remove_keymap_conflicts({'j', 'k'})
-     fig, ax = plt.subplots()
-     ax.volume = volume
-     ax.index = volume.shape[0] // 2
-     ax.imshow(volume[ax.index])
-     fig.canvas.mpl_connect('key_press_event', process_key)
+def multi_slice_viewer(volume):
+    remove_keymap_conflicts({'j', 'k'})
+    fig, ax = plt.subplots()
+    ax.volume = volume
+    ax.index = volume.shape[0] // 2
+    ax.imshow(volume[ax.index])
+    fig.canvas.mpl_connect('key_press_event', process_key)
