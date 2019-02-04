@@ -81,11 +81,18 @@ class AAPM(Dataset):
         img = patient.load_img()
         mask = patient.load_mask()
 
-        if self.tissue:
-            print(f'tissue map: {self.tissue_map[self.tissue]}')
-            mask = mask == self.tissue_map[self.tissue]
+        #if self.tissue:
+        #    print(f'tissue map: {self.tissue_map[self.tissue]}')
+            #mask = mask == self.tissue_map[self.tissue]
+        mask0 = mask == self.tissue_map['background']
+        mask1 = mask == self.tissue_map['heart']
+        mask2 = mask == self.tissue_map['esophagus']
+        mask3 = mask == self.tissue_map['bone']
+        mask4 = mask == self.tissue_map['rightlung']
+        mask5 = mask == self.tissue_map['leftlung']
+
 
         if self.transform is not None:
             img = self.transform(img)
 
-        return img, mask
+        return img, mask, [mask0, mask1, mask2, mask3, mask4, mask5]
