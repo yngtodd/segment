@@ -63,11 +63,11 @@ class AAPM(Dataset):
         self.tissue = tissue
         self.tissue_map = {
             'background': 0,
-            'heart': 1,
-            'esophagus': 2,
-            'bone': 3,
+            'esophagus': 1,
+            'heart': 2,
+            'leftlung': 3,
             'rightlung': 4,
-            'leftlung': 5
+            'spine': 5,
         }
 
     def __repr__(self):
@@ -82,7 +82,6 @@ class AAPM(Dataset):
         mask = patient.load_mask()
 
         if self.tissue:
-            print(f'tissue map: {self.tissue_map[self.tissue]}')
             mask = mask == self.tissue_map[self.tissue]
 
         if self.transform is not None:
