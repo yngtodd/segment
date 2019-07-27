@@ -21,7 +21,7 @@ class ResidualBlock(nn.Module):
     def forward(self, x):
         residual = x
         x = self.conv(x)
-        x = x + residual
+        x += residual
         return F.relu(x)
 
 
